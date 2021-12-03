@@ -89,11 +89,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         }
                     },
                 ],
-                [
-                  'audit_created_at',      
-                ],
-                ['audit_oa_finished_at'],
-                ['business_finished_at']
+                'audit_created_at',
+                'audit_oa_finished_at',
+                'business_finished_at',
             ],
         ]) ?>
     </div>
