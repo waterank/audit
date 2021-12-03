@@ -2,13 +2,11 @@
 
 namespace waterank\audit\service;
 
-use common\helpers\RestHelper;
 use waterank\audit\components\OaHttpComponent;
 use waterank\audit\models\Audit;
 use waterank\audit\models\AuditSearch;
 use waterank\audit\task\OaGenerateTask;
 use yii\base\Controller;
-use yii\base\Object;
 use yii\helpers\Url;
 use yii;
 use yii\base\UserException;

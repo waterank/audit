@@ -2,10 +2,7 @@
 
 namespace waterank\audit\models;
 
-use yii\base\BaseObject;
-use yii\base\Object;
 use yii\data\ActiveDataProvider;
-use yii\helpers\ArrayHelper;
 
 class AuditSearch extends Audit
 {

@@ -3,7 +3,6 @@
 namespace waterank\audit\task;
 
 use common\business\task\TaskHandler;
-use common\models\KeyValue;
 use common\models\Task;
 
 class CapitalTaskProxyHandler extends TaskHandler

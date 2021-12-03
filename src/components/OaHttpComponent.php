@@ -2,11 +2,6 @@
 
 namespace waterank\audit\components;
 
-use common\helpers\RestHelper;
-use common\models\KeyValue;
-
-use waterank\audit\components\OaCapitalComponent;
-use waterank\audit\components\OaXlerrComponent;
 use waterank\audit\service\AuditService;
 use yii;
 

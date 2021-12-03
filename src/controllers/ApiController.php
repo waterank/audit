@@ -2,15 +2,10 @@
 
 namespace waterank\audit\controllers;
 
-use common\consts\Consts;
-use common\helpers\RestHelper;
 use waterank\audit\components\OaHttpComponent;
-use waterank\audit\models\Audit;
 use waterank\audit\service\AuditService;
 use waterank\audit\task\OaCallbackTask;
-use waterank\audit\task\OaGenerateTask;
 use yii;
-use yii\base\Object;
 use yii\rest\Controller;
 use yii\web\Response;
 

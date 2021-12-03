@@ -5,7 +5,6 @@ namespace waterank\audit\task;
 use waterank\audit\business\BusinessInterface;
 use waterank\audit\components\OaHttpComponent;
 use waterank\audit\models\Audit;
-use waterank\audit\service\AuditService;
 use xlerr\proxy\task\ProxyTaskHandler;
 use yii\base\UserException;
 use yii\db\Exception;

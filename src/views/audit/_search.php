@@ -2,7 +2,6 @@
 
 use waterank\audit\models\AuditSearch;
 use waterank\audit\models\Audit;
-use common\models\Asset;
 use xlerr\common\widgets\ActiveForm;
 use xlerr\common\widgets\Select2;
 use yii\helpers\Html;
