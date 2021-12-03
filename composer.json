@@ -1,6 +1,7 @@
 {
   "name": "waterank/audit",
   "description": "kuainiu group audit component",
+  "license": "MIT",
   "authors": [
     {
       "name": "chenquan",
@@ -24,5 +25,5 @@
       "waterank\\audit\\": "src"
     }
   },
-  "version": "1.1.7"
+  "minimum-stability": "stable"
 }
