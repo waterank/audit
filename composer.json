@@ -1,0 +1,28 @@
+{
+  "name": "waterank/audit",
+  "description": "kuainiu group audit component",
+  "authors": [
+    {
+      "name": "chenquan",
+      "email": "sgr_cq@126.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.1.0",
+    "yiisoft/yii2": "2.0.12.2",
+    "yiisoft/yii2-redis": "~2.0.0",
+    "ext-json": "*"
+  },
+  "repositories": {
+    "composer": {
+      "type": "composer",
+      "url": "https://asset-packagist.org"
+    }
+  },
+  "autoload": {
+    "psr-4": {
+      "waterank\\audit\\": "src"
+    }
+  },
+  "version": "1.1.7"
+}
