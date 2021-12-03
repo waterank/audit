@@ -44,7 +44,7 @@ class AuditController extends Controller
      *
      * @param $id
      *
-     * @return OfflineFeeRule
+     * @return Audit
      * @throws NotFoundHttpException
      */
     protected function findModel($id): Audit

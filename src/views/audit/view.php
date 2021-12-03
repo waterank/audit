@@ -1,9 +1,7 @@
 <?php
 
-use xlerr\CodeEditor\CodeEditor;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
-use dcs\models\OfflineFeeRule;
 use waterank\audit\models\Audit;
 
 /* @var $this yii\web\View */
