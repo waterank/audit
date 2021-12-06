@@ -18,11 +18,9 @@ class OaCallbackTask extends ProxyTaskHandler
         $oaComponent = new OaHttpComponent();
         $status      = $data['status'] ?? '';
         $audit       = self::findByOaId($data['dataId'] ?? 0);
-        $oaAgree     = false;
         switch ($status) {
             case Audit::OA_AGREE_STATUS:
                 $audit->audit_status = Audit::STATUS_SUCCESS;
-                $oaAgree             = true;
                 break;
             case Audit::OA_REFUSE_STATUS:
                 $audit->audit_status = Audit::STATUS_FAILURE;
@@ -44,15 +42,13 @@ class OaCallbackTask extends ProxyTaskHandler
             if (!$audit->save()) {
                 throw new UserException(json_encode($audit->getErrors(), JSON_UNESCAPED_UNICODE));
             }
-            //若OA审核同意，实例化配置中对应审核类型的业务类，执行相应的业务逻辑
-            if ($oaAgree) {
-                $businessClassName = $oaComponent->getBusinessLogicClass($audit->audit_type);
-                $businessClass     = Yii::createObject($businessClassName);
-                if ($businessClass instanceof BusinessInterface) {
-                    $businessClass->process($audit); 
-                } else {
-                    throw new UserException('无法加载业务类：' . $businessClassName);
-                }
+            //实例化配置中对应审核类型的业务类，执行相应的业务逻辑
+            $businessClassName = $oaComponent->getBusinessLogicClass($audit->audit_type);
+            $businessClass     = Yii::createObject($businessClassName);
+            if ($businessClass instanceof BusinessInterface) {
+                $businessClass->process($audit);
+            } else {
+                throw new UserException('无法加载业务类：' . $businessClassName);
             }
             $transaction->commit();
         } catch (\Throwable $e) {

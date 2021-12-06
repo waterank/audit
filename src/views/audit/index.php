@@ -51,7 +51,7 @@ $this->params['breadcrumbs'][] = $this->title;?>
             'format'    => ['in', Audit::BUSINESS_STATUS_LIST],
         ],
         [
-            'attribute' => 'audit_user_name',
+            'attribute' => 'audit_creator_name',
         ],
     ],
 ]); ?>

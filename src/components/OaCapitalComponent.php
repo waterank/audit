@@ -122,11 +122,11 @@ class OaCapitalComponent implements OaComponentInterface
     /**
      * 获取跳转到OA授权的URL
      *
-     * @param $redisKey
+     * @param $cacheKey
      *
      * @return string
      */
-    public function getOaRedirectUrl($redisKey)
+    public function getOaRedirectUrl($cacheKey)
     {
         $query = http_build_query([
             'client_id'     => $this->clientId,
@@ -134,7 +134,7 @@ class OaCapitalComponent implements OaComponentInterface
             'response_type' => $this->responseType,
             'scope'         => $this->scope,
             'client_secret' => $this->clientSecret,
-            'state'         => $redisKey,
+            'state'         => $cacheKey,
         ]);
 
         return $this->oaUrl . '/oauth/authorize?' . $query;

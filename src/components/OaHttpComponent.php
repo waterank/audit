@@ -43,20 +43,21 @@ class OaHttpComponent implements OaComponentInterface
     public function getAccessToken($userId, $oaRefreshToken)
     {
         $accesInfo = $this->oaHttpClient->getAccessToken($userId,$oaRefreshToken);
-        Yii::$app->redis->setex($userId . AuditService::$oaRefreshTokenKey, 60 * 60 * 24 * 14,
-            $accesInfo['refresh_token'] ?? '');
+
+        Yii::$app->getCache()->set($userId . AuditService::$oaRefreshTokenKey,
+            $accesInfo['refresh_token'] ?? '',60 * 60 * 24 * 13);
         return $accesInfo['access_token']?? '';
     }
 
     /**
      * 获取跳转到OA授权URL
-     * @param $redisKey
+     * @param $cacheKey
      *
      * @return string
      */
-    public function getOaRedirectUrl($redisKey)
+    public function getOaRedirectUrl($cacheKey)
     {
-        return $this->oaHttpClient->getOaRedirectUrl($redisKey);
+        return $this->oaHttpClient->getOaRedirectUrl($cacheKey);
     }
 
     /**

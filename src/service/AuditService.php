@@ -4,7 +4,6 @@ namespace waterank\audit\service;
 
 use waterank\audit\components\OaHttpComponent;
 use waterank\audit\models\Audit;
-use waterank\audit\models\AuditSearch;
 use waterank\audit\task\OaGenerateTask;
 use yii\base\Controller;
 use yii\helpers\Url;
@@ -39,13 +38,13 @@ class AuditService extends Controller
             'user_name'  => $userName,
             'user_email' => $userEmail,
         ];
-        $redisKey  = self::saveOaCache($userInfo, $paramsKey, $auditType, $request, $params);
+        $cacheKey  = self::saveOaCache($userInfo, $paramsKey, $auditType, $request, $params);
         // 如果没有token 或者token存留时间小于1天（留一天用作异步TASK余量） 发起OA授权跳转
         $oaRefreshToken = self::checkInvalid($userId);
         if (!$oaRefreshToken) {
-            $url = $oaComponent->getOaRedirectUrl($redisKey);
+            $url = $oaComponent->getOaRedirectUrl($cacheKey);
 
-            Yii::$app->getResponse()->redirect(Url::to($url), 302);
+            return Yii::$app->getResponse()->redirect($url);
         }
         //生成AUDIT数据 开启OA task
         $auditModelParams = [
@@ -54,6 +53,7 @@ class AuditService extends Controller
             'user_name'       => $userName,
             'user_email'      => $userEmail,
             'audit_type'      => $auditType,
+
         ];
         self::saveAuditGenerateOa($auditModelParams);
     }
@@ -71,8 +71,8 @@ class AuditService extends Controller
      */
     public static function saveOaCache(array $userInfo, $paramsKey, $auditType, $request, $params)
     {
-        $redisKey  = $userInfo['user_id'] . '_' . time();
-        $redisInfo = [
+        $cacheKey  = $userInfo['user_id'] . '_' . time();
+        $cacheInfo = [
             'params'     => [
                 'key'   => $paramsKey,
                 'value' => $params,
@@ -81,9 +81,9 @@ class AuditService extends Controller
             'user_info'  => $userInfo,
             'audit_type' => $auditType,
         ];
-        Yii::$app->redis->setex($redisKey, 60 * 60, json_encode($redisInfo, JSON_UNESCAPED_UNICODE));
+        Yii::$app->getCache()->set($cacheKey, $cacheInfo, 60 * 60);
 
-        return $redisKey;
+        return $cacheKey;
     }
 
 
@@ -96,10 +96,7 @@ class AuditService extends Controller
      */
     public static function checkInvalid($userId)
     {
-        $oaRefreshToken = Yii::$app->redis->get($userId . self::$oaRefreshTokenKey);
-        $tokenTtl       = Yii::$app->redis->ttl($userId . self::$oaRefreshTokenKey);
-
-        return (!$oaRefreshToken || $tokenTtl <= 60 * 60 * 24) ? '' : $oaRefreshToken;
+        return Yii::$app->getCache()->get($userId . self::$oaRefreshTokenKey);
     }
 
     /**
@@ -113,15 +110,14 @@ class AuditService extends Controller
     public static function saveAuditGenerateOa($auditModelParams)
     {
         //生成审核表数据
-        $audit                   = new Audit();
-        $oaComponent             = new OaHttpComponent();
-        $audit->audit_status     = Audit::STATUS_PROCESSING;
-        $audit->audit_oa_params  = $auditModelParams['audit_oa_params'];
-        $audit->audit_user_id    = $auditModelParams['user_id'];
-        $audit->audit_user_name  = $auditModelParams['user_name'];
-        $audit->audit_user_email = $auditModelParams['user_email'];
-        $audit->audit_type       = $auditModelParams['audit_type'];
-        $transaction             = Audit::getDb()->beginTransaction();
+        $audit                      = new Audit();
+        $audit->audit_status        = Audit::STATUS_PROCESSING;
+        $audit->audit_oa_params     = $auditModelParams['audit_oa_params'];
+        $audit->audit_creator_id    = $auditModelParams['user_id'];
+        $audit->audit_creator_name  = $auditModelParams['user_name'];
+        $audit->audit_creator_email = $auditModelParams['user_email'];
+        $audit->audit_type          = $auditModelParams['audit_type'];
+        $transaction                = Audit::getDb()->beginTransaction();
         try {
             if ($audit->save()) {
                 OaGenerateTask::make([
@@ -135,11 +131,10 @@ class AuditService extends Controller
             $transaction->rollBack();
             throw new UserException(json_encode($e->getMessage(), JSON_UNESCAPED_UNICODE));
         }
-        Yii::$app->getResponse()->redirect([
-            '/audit/audit/index',
-            (new AuditSearch())->formName() => [
-                'audit_type' => $audit->audit_type,
-            ],
-        ], 302);
+        Yii::$app->session->addFlash("success", "你已成功提交，需要先经过OA审核，请在此审核列表</a>中查看进度");
+
+//        return  Yii::$app->getResponse()->redirect($auditModelParams['referrer']);
+        return Yii::$app->getResponse()->redirect('/audit/audit/index');
     }
+
 }

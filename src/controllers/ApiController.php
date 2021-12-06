@@ -19,16 +19,14 @@ class ApiController extends Controller
      */
     public function actionOaRedirect()
     {
-
         $apiParams = Yii::$app->request->get();
         $state     = $apiParams['state'] ?? '';
         $code      = $apiParams['code'] ?? '';
         $error     = $apiParams['error'] ?? '';
-        $data      = Yii::$app->redis->get($state);
+        $data      = Yii::$app->getCache()->get($state);
         if (!$data) {
             return $this->redirect('index');
         }
-        $data      = json_decode($data, true);
         $params    = $data['params'] ?? [];
         $userInfo  = $data['user_info'] ?? [];
         $userId    = $userInfo['user_id'] ?? 0;
@@ -54,8 +52,8 @@ class ApiController extends Controller
             ]);
         }
         if (!empty($response['refresh_token'])) {
-            Yii::$app->redis->setex($userId . AuditService::$oaRefreshTokenKey, 60 * 60 * 24 * 14,
-                $response['refresh_token']);
+            Yii::$app->getCache()->set($userId . AuditService::$oaRefreshTokenKey, $response['refresh_token'],
+                60 * 60 * 24 * 13);
         }
         //生成AUDIT数据 开启OA task
         $auditModelParams = [
@@ -70,26 +68,25 @@ class ApiController extends Controller
 
     /**
      * OA审核通过或拒绝，回调API
+     *
      * @throws \Throwable
      */
     public function actionOaCallback()
     {
-        $data = Yii::$app->request->post();
-        $eventData                  = $data['event_data'] ?? '';
-        $eventDataArray             = json_decode($eventData, true);
-        $info                       = $eventDataArray['entry'] ?? [];
+        $eventData                  = Yii::$app->request->post('event_data');
+        $eventDataArray             = json_decode($eventData ?? '', true);
         $id                         = $eventDataArray['entry']['entry_id'] ?? 0;
         $statusCode                 = $eventDataArray['entry']['status_code'] ?? 0;
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        if(!empty($data['debug'])){
+        Yii::$app->response->format = Response::FORMAT_RAW;
+        if (!empty($data['debug'])) {
             $id         = $data['id'];
-            $statusCode = $data['status']; 
+            $statusCode = $data['status'];
         }
         OaCallbackTask::make([
             'dataId' => $id,
             'status' => $statusCode,
         ]);
-        echo 'success';
-        exit;
+
+        return 'success';
     }
 }
