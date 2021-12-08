@@ -44,7 +44,7 @@ class ApiController extends Controller
         $oaComponent = new OaHttpComponent();
 
         $response = $oaComponent->getRefreshToken($code);
-        if (!empty($response['error'])) {
+        if (!empty($response['error'] || empty($response['refresh_token']))) {
             return $this->redirect([
                 $params['route'] ?? '/index',
                 $params['key'] ?? 'oaRedirect' => $params['value'] ?? [],
