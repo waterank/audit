@@ -73,19 +73,18 @@ class ApiController extends Controller
      */
     public function actionOaCallback()
     {
-        $eventData                  = Yii::$app->request->post('event_data');
-        $eventDataArray             = json_decode($eventData ?? '', true);
-        $id                         = $eventDataArray['entry']['entry_id'] ?? 0;
-        $statusCode                 = $eventDataArray['entry']['status_code'] ?? 0;
-        Yii::$app->response->format = Response::FORMAT_RAW;
-        if (!empty($data['debug'])) {
-            $id         = $data['id'];
-            $statusCode = $data['status'];
-        }
+        $data       = file_get_contents('php://input');
+        $dataArray  = json_decode($data ?? '', true);
+        $eventData  = json_decode($dataArray['event_data'] ?? '', true);
+        $id         = $eventData['entry']['entry_id'] ?? 0;
+        $statusCode = $eventData['entry']['status_code'] ?? 0;
+
         OaCallbackTask::make([
             'dataId' => $id,
             'status' => $statusCode,
+            'test'=> file_get_contents('php://input')
         ]);
+        Yii::$app->response->format = Response::FORMAT_RAW;
 
         return 'success';
     }
