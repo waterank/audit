@@ -3,6 +3,7 @@
 namespace waterank\audit\controllers;
 
 use waterank\audit\components\OaHttpComponent;
+use waterank\audit\models\Audit;
 use waterank\audit\service\AuditService;
 use waterank\audit\task\OaCallbackTask;
 use yii;
@@ -78,12 +79,13 @@ class ApiController extends Controller
         $eventData  = json_decode($dataArray['event_data'] ?? '', true);
         $id         = $eventData['entry']['entry_id'] ?? 0;
         $statusCode = $eventData['entry']['status_code'] ?? 0;
-
-        OaCallbackTask::make([
-            'dataId' => $id,
-            'status' => $statusCode,
-            'test'=> file_get_contents('php://input')
-        ]);
+        if (in_array($statusCode, [Audit::OA_AGREE_STATUS, Audit::OA_REFUSE_STATUS])) {
+            OaCallbackTask::make([
+                'dataId' => $id,
+                'status' => $statusCode,
+                'test'   => file_get_contents('php://input'),
+            ]);
+        }
         Yii::$app->response->format = Response::FORMAT_RAW;
 
         return 'success';
