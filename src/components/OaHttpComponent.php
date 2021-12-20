@@ -46,7 +46,7 @@ class OaHttpComponent implements OaComponentInterface
 
         Yii::$app->getCache()->set($userId . AuditService::$oaRefreshTokenKey,
             $accesInfo['refresh_token'] ?? '',60 * 60 * 24 * 13);
-        return $accesInfo['access_token']?? '';
+        return $accesInfo;
     }
 
     /**
