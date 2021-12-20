@@ -40,12 +40,12 @@ class AuditService extends Controller
         ];
         $cacheKey  = self::saveOaCache($userInfo, $paramsKey, $auditType, $request, $params);
         // 如果没有token 或者token存留时间小于1天（留一天用作异步TASK余量） 发起OA授权跳转
-        $oaRefreshToken = self::checkInvalid($userId);
-        if (!$oaRefreshToken) {
+//        $oaRefreshToken = self::checkInvalid($userId);
+//        if (!$oaRefreshToken) {
             $url = $oaComponent->getOaRedirectUrl($cacheKey);
 
             return Yii::$app->getResponse()->redirect($url);
-        }
+//        }
         //生成AUDIT数据 开启OA task
         $auditModelParams = [
             'audit_oa_params' => json_encode($params, JSON_UNESCAPED_UNICODE),
