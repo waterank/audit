@@ -5,12 +5,10 @@ namespace waterank\audit\service;
 use waterank\audit\components\OaHttpComponent;
 use waterank\audit\models\Audit;
 use waterank\audit\task\OaGenerateTask;
-use yii\base\Controller;
-use yii\helpers\Url;
 use yii;
 use yii\base\UserException;
 
-class AuditService extends Controller
+class AuditService
 {
 
     public static $oaRefreshTokenKey = '_oa_refresh_token';
