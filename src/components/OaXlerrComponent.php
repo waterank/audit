@@ -3,21 +3,152 @@
 namespace waterank\audit\components;
 
 use GuzzleHttp\RequestOptions;
+use Psr\Http\Message\ResponseInterface;
 use xlerr\httpca\ComponentTrait;
 use xlerr\httpca\RequestClient;
+use yii\base\UserException;
 
-class OaXlerrComponent extends RequestClient implements  OaComponentInterface
+
+class OaXlerrComponent extends RequestClient implements OaComponentInterface
 {
     use ComponentTrait;
 
-    
-    public function createOa()
+    public string $oaUrl;
+
+    public int $clientId;
+    public string $redirectUrl;
+    public string $responseType;
+    public string $scope;
+    public string $clientSecret;
+    public array $oaConfig;
+
+    public function createOa($params, $auditType, $accessToken)
     {
-        // TODO: Implement createOa() method.
+        $oaTemplate = $this->oaConfig[$auditType]['flow_key'] ?? '';
+        if (!$oaTemplate) {
+            throw new UserException("找不到flow_key");
+        }
+
+        $this->post('openapi/approval/create', [
+            RequestOptions::JSON    => [
+                'flow_key'   => $oaTemplate,
+                'entry_data' => $params,
+            ],
+            RequestOptions::HEADERS => [
+                'Content-Type'  => 'application/json',
+                'Authorization' => 'Bearer ' . $accessToken,
+            ],
+
+        ]);
+
+        $response = $this->getResponse();
+
+        return (array)json_decode($response['data'] ?? '', true);
     }
-    
-    public function getAccessToken()
+
+    public function getAccessToken($userId, $oaRefreshToken)
     {
-        // TODO: Implement getAccessToken() method.
+        $this->post('oauth/token', [
+            RequestOptions::JSON => [
+                'grant_type'    => 'refresh_token',
+                'refresh_token' => $oaRefreshToken,
+                'client_id'     => $this->clientId,
+                'client_secret' => $this->clientSecret,
+                'scope'         => $this->scope,
+            ],
+        ]);
+
+        return $this->getResponse();
+    }
+
+    public function getOaRedirectUrl($cacheKey)
+    {
+        $query = http_build_query([
+            'client_id'     => $this->clientId,
+            'redirect_uri'  => $this->redirectUrl,
+            'response_type' => $this->responseType,
+            'scope'         => $this->scope,
+            'client_secret' => $this->clientSecret,
+            'state'         => $cacheKey,
+        ]);
+
+        return $this->oaUrl . 'oauth/authorize?' . $query;
+    }
+
+    public function getRefreshToken($code)
+    {
+        $this->post('oauth/token', [
+            RequestOptions::JSON => [
+                'grant_type'    => 'authorization_code',
+                'client_id'     => $this->clientId,
+                'client_secret' => $this->clientSecret,
+                'redirect_uri'  => $this->redirectUrl,
+                'code'          => $code,
+            ],
+        ]);
+
+        return $this->getResponse();
+    }
+
+    /**
+     * @param ResponseInterface $response
+     *
+     * @return array
+     */
+    protected function handleResponse(ResponseInterface $response)
+    {
+        $content = (string)$response->getBody();
+
+        return (array)json_decode($content, true);
+    }
+
+    public function getClientToken()
+    {
+        $this->post('oauth/token', [
+            RequestOptions::JSON => [
+                'grant_type'    => 'client_credentials',
+                'client_id'     => $this->clientId,
+                'client_secret' => $this->clientSecret,
+                'scope'         => $this->scope,
+            ],
+        ]);
+
+        return $this->getResponse();
+    }
+
+    public function getOaNodeInfo($accessToken, $entry_ids)
+    {
+        $this->get('openapi/approval/queryDetail?entry_ids=' . $entry_ids, [
+            RequestOptions::HEADERS => [
+                'Content-Type: application/json',
+                'Authorization:Bearer ' . $accessToken,
+            ],
+        ]);
+    }
+
+    /**
+     * 获取OA审核单在配置中对应的业务类路径
+     *
+     * @param $auditType
+     *
+     * @return mixed|string
+     */
+    public function getBusinessLogicClass($auditType)
+    {
+        return $this->oaConfig[$auditType]['business_logic_class'] ?? '';
+    }
+
+    public function getAuditTypeList()
+    {
+        $config = $this->oaConfig;
+        $result = [];
+        foreach ($config as $item => $value) {
+            if ($item == 'oauth') {
+                continue;
+            }
+            $result[$item] = $value['note'] ?? '未知';
+        }
+
+        return $result;
     }
 }

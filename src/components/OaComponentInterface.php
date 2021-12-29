@@ -4,7 +4,7 @@ namespace waterank\audit\components;
 
 interface OaComponentInterface
 {
-    public function createOa($params,$auditType,$accesToken);
+    public function createOa($params,$auditType,$accessToken);
     
     public function getAccessToken($userId,$oaRefreshToken);
     

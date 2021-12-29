@@ -23,37 +23,22 @@ class AuditService
      * @return \yii\console\Response|\yii\web\Response
      * @throws \yii\base\UserException
      */
-    public static function oaAudit($paramsKey, $auditType, $params)
+    public static function oaAudit($paramsKey, $auditType, $params, $custom = [])
     {
         $oaComponent = new OaHttpComponent();
-
-        $userId    = Yii::$app->user->id;
-        $userName  = Yii::$app->user->identity->fullname;
-        $userEmail = Yii::$app->user->identity->email;
-        $request   = Yii::$app->request;
-        $userInfo  = [
+        $userId      = Yii::$app->user->id;
+        $userName    = Yii::$app->user->identity->fullname;
+        $userEmail   = Yii::$app->user->identity->email;
+        $request     = Yii::$app->request;
+        $userInfo    = [
             'user_id'    => $userId,
             'user_name'  => $userName,
             'user_email' => $userEmail,
         ];
-        $cacheKey  = self::saveOaCache($userInfo, $paramsKey, $auditType, $request, $params);
-        // 如果没有token 或者token存留时间小于1天（留一天用作异步TASK余量） 发起OA授权跳转
-//        $oaRefreshToken = self::checkInvalid($userId);
-//        if (!$oaRefreshToken) {
-            $url = $oaComponent->getOaRedirectUrl($cacheKey);
+        $cacheKey    = self::saveOaCache($userInfo, $paramsKey, $auditType, $request, $params, $custom);
+        $url = $oaComponent->getOaRedirectUrl($cacheKey);
 
-            return Yii::$app->getResponse()->redirect($url);
-//        }
-        //生成AUDIT数据 开启OA task
-        $auditModelParams = [
-            'audit_oa_params' => json_encode($params, JSON_UNESCAPED_UNICODE),
-            'user_id'         => $userId,
-            'user_name'       => $userName,
-            'user_email'      => $userEmail,
-            'audit_type'      => $auditType,
-
-        ];
-        self::saveAuditGenerateOa($auditModelParams);
+        return Yii::$app->getResponse()->redirect($url);
     }
 
     /**
@@ -67,7 +52,7 @@ class AuditService
      *
      * @return string
      */
-    public static function saveOaCache(array $userInfo, $paramsKey, $auditType, $request, $params)
+    public static function saveOaCache(array $userInfo, $paramsKey, $auditType, $request, $params, $custom = [])
     {
         $cacheKey  = $userInfo['user_id'] . '_' . time();
         $cacheInfo = [
@@ -79,6 +64,9 @@ class AuditService
             'user_info'  => $userInfo,
             'audit_type' => $auditType,
         ];
+        if ($custom) {
+            $cacheInfo['custom'] = $custom;
+        }
         Yii::$app->getCache()->set($cacheKey, $cacheInfo, 60 * 60);
 
         return $cacheKey;

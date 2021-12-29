@@ -28,29 +28,30 @@ class ApiController extends Controller
         if (!$data) {
             return $this->redirect('index');
         }
-        $params    = $data['params'] ?? [];
-        $userInfo  = $data['user_info'] ?? [];
-        $userId    = $userInfo['user_id'] ?? 0;
-        $userName  = $userInfo['user_name'] ?? '';
-        $userEmail = $userInfo['user_email'] ?? '';
-        $auditType = $data['audit_type'] ?? '';
-
+        $params       = $data['params'] ?? [];
+        $userInfo     = $data['user_info'] ?? [];
+        $userId       = $userInfo['user_id'] ?? 0;
+        $userName     = $userInfo['user_name'] ?? '';
+        $userEmail    = $userInfo['user_email'] ?? '';
+        $auditType    = $data['audit_type'] ?? '';
+        $custom       = $data['custom'] ?? [];
+        $redirectInfo = [
+            $params['route'] ?? '/index',
+            $params['key'] ?? 'oaRedirece' => $params['value'] ?? [],
+            'refuse'                       => 1,
+        ];
+        foreach ($custom as $k => $value) {
+            $redirectInfo[$k] = $value;
+        }
         if (!$code && $error) { //拒绝的话原路跳回页面并渲染
-            return $this->redirect([
-                $params['route'] ?? '/index',
-                $params['key'] ?? 'oaRedirece' => $params['value'] ?? [],
-                'refuse'                       => 1,
-            ]);
+            return $this->redirect($redirectInfo);
         }
         $oaComponent = new OaHttpComponent();
 
         $response = $oaComponent->getRefreshToken($code);
         if (!empty($response['error']) || empty($response['refresh_token'])) {
-            return $this->redirect([
-                $params['route'] ?? '/index',
-                $params['key'] ?? 'oaRedirect' => $params['value'] ?? [],
-                'refuse'                       => 2,
-            ]);
+            $redirectInfo['refuse'] = 2;
+            return $this->redirect($redirectInfo);
         }
         if (!empty($response['refresh_token'])) {
             Yii::$app->getCache()->set($userId . AuditService::$oaRefreshTokenKey, $response['refresh_token'],
