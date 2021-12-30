@@ -32,9 +32,14 @@ class OaCallbackTask extends ProxyTaskHandler
         if (!$accessToken) {
             throw new UserException("accesToken 获取失败");
         }
-        //获取审核节点信息
-        $oaNodeInfo                  =
-            json_encode($oaComponent->getOaNodeInfo($accessToken, $audit->audit_oa_id), JSON_UNESCAPED_UNICODE);
+        //获取审核节点信息 并验证OA审核单的状态  必须跟传过来的状态吻合
+        $oaNodeInfo = $oaComponent->getOaNodeInfo($accessToken, $audit->audit_oa_id);
+        $nodeData   = json_decode((string)$oaNodeInfo['data'] ?? '', true);
+        if (!isset($nodeData['status_code']) || $nodeData['status_code'] != $status) {
+            throw new UserException("无法获取oa单状态或oa单状态与提交的状态不符");
+        }
+        $oaNodeInfo = json_encode($oaNodeInfo, JSON_UNESCAPED_UNICODE);
+
         $audit->audit_oa_response    = $oaNodeInfo;
         $audit->audit_oa_finished_at = date("Y-m-d H:i:s");
         $transaction                 = Audit::getDb()->beginTransaction();
