@@ -17,7 +17,8 @@ class OaCallbackTask extends ProxyTaskHandler
     {
         $oaComponent = new OaHttpComponent();
         $status      = $data['status'] ?? '';
-        $audit       = self::findByOaId($data['dataId'] ?? 0);
+        $oaID        = $data['dataId'] ?? 0;
+        $audit       = self::findByOaId($oaID);
         switch ($status) {
             case Audit::OA_AGREE_STATUS:
                 $audit->audit_status = Audit::STATUS_SUCCESS;
@@ -27,6 +28,11 @@ class OaCallbackTask extends ProxyTaskHandler
                 break;
             default:
                 $audit->audit_status = Audit::STATUS_FAILURE;
+        }
+        if (isset($audit->audit_status)
+            && $audit->audit_status != Audit::STATUS_WAIT_OA_AUDIT
+        ) {
+            throw new UserException('审核单状态不是' . Audit::STATUS_WAIT_OA_AUDIT . '#OAID:' . $oaID);
         }
         $accessToken = $oaComponent->getClientToken();
         if (!$accessToken) {
