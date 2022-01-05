@@ -43,7 +43,7 @@ class OaCallbackTask extends ProxyTaskHandler
         $oaNodeInfo = $oaComponent->getOaNodeInfo($accessToken, $audit->audit_oa_id);
         $nodeData   = json_decode($oaNodeInfo['data'] ?? '', true);
         if (!isset($nodeData['status_code']) || $nodeData['status_code'] != $status) {
-            throw new UserException("无法获取oa单状态或oa单状态与提交的状态不符:".$oaNodeInfo);
+            throw new UserException("无法获取oa单状态或oa单状态与提交的状态不符:".json_encode($oaNodeInfo,JSON_UNESCAPED_UNICODE));
         }
         $oaNodeInfo = json_encode($oaNodeInfo, JSON_UNESCAPED_UNICODE);
 
