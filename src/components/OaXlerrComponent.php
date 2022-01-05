@@ -120,8 +120,8 @@ class OaXlerrComponent extends RequestClient implements OaComponentInterface
     {
         $this->get('openapi/approval/queryDetail?entry_ids=' . $entry_ids, [
             RequestOptions::HEADERS => [
-                'Content-Type: application/json',
-                'Authorization:Bearer ' . $accessToken,
+                'Content-Type'  => 'application/json',
+                'Authorization' => 'Bearer ' . $accessToken,
             ],
         ]);
         return $this->getResponse();
