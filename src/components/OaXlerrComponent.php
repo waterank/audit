@@ -124,6 +124,8 @@ class OaXlerrComponent extends RequestClient implements OaComponentInterface
                 'Authorization:Bearer ' . $accessToken,
             ],
         ]);
+        return $this->getResponse();
+
     }
 
     /**
