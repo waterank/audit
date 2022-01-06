@@ -19,7 +19,12 @@ class OaGenerateTask extends ProxyTaskHandler
         $audit          = self::findByAuditId($data['dataId'] ?? 0);
         $auditType      = $audit->audit_type;
         $userId         = $audit->audit_creator_id;
-        $oaParams       = json_decode($audit->audit_oa_params, true);
+        $params = json_decode($audit->audit_oa_params, true);
+        if(isset($params['params'])){
+            $oaParams =  $params['params']['WorkflowApply'] ?? [];
+        }else{
+            $oaParams = $params;
+        }
         $oaRefreshToken = Yii::$app->getCache()->get($userId . AuditService::$oaRefreshTokenKey);
         $accesInfo    = $oaComponent->getAccessToken($userId, $oaRefreshToken);
         if (empty($accesInfo['access_token'])) {
