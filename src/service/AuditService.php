@@ -23,7 +23,7 @@ class AuditService
      * @return \yii\console\Response|\yii\web\Response
      * @throws \yii\base\UserException
      */
-    public static function oaAudit($paramsKey, $auditType, $params, $custom = [])
+    public static function oaAudit($paramsKey, $auditType, $params, $custom = [],$returnUrl = false)
     {
         $oaComponent = new OaHttpComponent();
         $userId      = Yii::$app->user->id;
@@ -37,8 +37,11 @@ class AuditService
         ];
         $cacheKey    = self::saveOaCache($userInfo, $paramsKey, $auditType, $request, $params, $custom);
         $url = $oaComponent->getOaRedirectUrl($cacheKey);
-
-        return Yii::$app->getResponse()->redirect($url);
+        if($returnUrl){
+            return $url;
+        }else{
+            return Yii::$app->getResponse()->redirect($url);
+        }
     }
 
     /**
