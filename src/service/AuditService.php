@@ -20,7 +20,7 @@ class AuditService
      * @param $auditType
      * @param $params
      *
-     * @return \yii\console\Response|\yii\web\Response
+     * @return \yii\console\Response|\yii\web\Response|string
      * @throws \yii\base\UserException
      */
     public static function oaAudit($paramsKey, $auditType, $params, $custom = [],$returnUrl = false)
