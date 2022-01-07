@@ -52,7 +52,7 @@ class Audit extends yii\db\ActiveRecord
     const BUSINESS_STATUS_LIST = [
         self::BUSINESS_NO_PROCESS => '业务未处理',
         self::BUSINESS_PROCESSING => '业务处理中',
-        self::BUSINESS_SUCCESS    => '业务完成',
+        self::BUSINESS_SUCCESS    => '业务已结束',
         self::BUSINESS_FAILURE    => '业务处理失败，等待重试',
     ];
 
