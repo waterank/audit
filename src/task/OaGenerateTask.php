@@ -28,7 +28,7 @@ class OaGenerateTask extends ProxyTaskHandler
         $oaRefreshToken = Yii::$app->getCache()->get($userId . AuditService::$oaRefreshTokenKey);
         $accesInfo    = $oaComponent->getAccessToken($userId, $oaRefreshToken);
         if (empty($accesInfo['access_token'])) {
-            throw new UserException("accesToken 获取失败:".json_encode($accesInfo, JSON_UNESCAPED_UNICODE));
+            throw new UserException("accesToken 获取失败:".json_encode($accesInfo, JSON_UNESCAPED_UNICODE).'accessToken:'.$oaRefreshToken);
         }
         $accessToken = $accesInfo['access_token'];
         $oaResponse         = $oaComponent->createOa($oaParams, $auditType, $accessToken);
