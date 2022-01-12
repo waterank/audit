@@ -5,6 +5,7 @@ namespace waterank\audit\controllers;
 use waterank\audit\components\OaHttpComponent;
 use waterank\audit\models\Audit;
 use waterank\audit\service\AuditService;
+use waterank\audit\task\BusinessCallbackTask;
 use waterank\audit\task\OaCallbackTask;
 use yii;
 use yii\rest\Controller;
@@ -90,5 +91,28 @@ class ApiController extends Controller
         Yii::$app->response->format = Response::FORMAT_RAW;
 
         return 'success';
+    }
+
+
+    /**
+     * @return array
+     * @throws \Throwable
+     */
+    public function actionBusinessCallback()
+    {
+        $data        = file_get_contents('php://input');
+        $dataArray   = json_decode($data ?? '', true);
+        $businessKey = $dataArray['business_key'] ?? '';
+        $status      = $dataArray['status'] ?? '';
+        if(in_array($status,[Audit::BUSINESS_SUCCESS,Audit::BUSINESS_FAILURE])){
+            BusinessCallbackTask::make([
+                'key'         => $businessKey,
+                'status'      => $status,
+                'finish_time' => date("Y-m-d H:i:s"),
+            ]);
+        }
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        return ['code'=>0,'message'=>''];
     }
 }
