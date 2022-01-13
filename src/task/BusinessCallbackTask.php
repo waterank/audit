@@ -21,7 +21,18 @@ class BusinessCallbackTask extends ProxyTaskHandler
     {
         $status     = $data['status'] ?? '';
         $finishTime = $data['finish_time'] ?? '';
-        $audit      = self::findByBusinessKey($data['key'] ?? 0);
+        $auditSource = $data['audit_source'] ?? 'business_key';
+        $audit = '';
+        switch ($auditSource){
+            case 'business_key':
+                $audit      = self::findByBusinessKey($data['key'] ?? 0);
+            break;
+            case 'audit_id':
+                $audit      = self::findById($data['key'] ?? 0);
+        }
+        if(!$audit){
+            throw new Exception("audit_source无法验证:".$auditSource);
+        }
         switch ($status) {
             case Audit::BUSINESS_FAILURE:
                 $audit->business_status = Audit::BUSINESS_FAILURE;
@@ -49,6 +60,16 @@ class BusinessCallbackTask extends ProxyTaskHandler
     public static function findByBusinessKey($key): Audit
     {
         $audit = Audit::findOne(['business_key' => $key]);
+        if (!$audit) {
+            throw new Exception("审核数据不存在!");
+        }
+
+        return $audit;
+    }
+
+    public static function findById($key): Audit
+    {
+        $audit = Audit::findOne(['audit_id' => $key]);
         if (!$audit) {
             throw new Exception("审核数据不存在!");
         }
