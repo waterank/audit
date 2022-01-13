@@ -52,6 +52,7 @@ class ApiController extends Controller
         $response = $oaComponent->getRefreshToken($code);
         if (!empty($response['error']) || empty($response['refresh_token'])) {
             $redirectInfo['refuse'] = 2;
+
             return $this->redirect($redirectInfo);
         }
         if (!empty($response['refresh_token'])) {
@@ -103,16 +104,18 @@ class ApiController extends Controller
         $data        = file_get_contents('php://input');
         $dataArray   = json_decode($data ?? '', true);
         $businessKey = $dataArray['business_key'] ?? '';
+        $auditId     = $dataArray['audit_id'] ?? 0;
         $status      = $dataArray['status'] ?? '';
-        if(in_array($status,[Audit::BUSINESS_SUCCESS,Audit::BUSINESS_FAILURE])){
+        if (in_array($status, [Audit::BUSINESS_SUCCESS, Audit::BUSINESS_FAILURE])) {
             BusinessCallbackTask::make([
-                'key'         => $businessKey,
-                'status'      => $status,
-                'finish_time' => date("Y-m-d H:i:s"),
+                'key'          => $auditId,
+                'status'       => $status,
+                'finish_time'  => date("Y-m-d H:i:s"),
+                'audit_source' => 'audit_id',
             ]);
         }
         Yii::$app->response->format = Response::FORMAT_JSON;
 
-        return ['code'=>0,'message'=>''];
+        return ['code' => 0, 'message' => 'success'];
     }
 }

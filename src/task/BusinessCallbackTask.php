@@ -19,19 +19,20 @@ class BusinessCallbackTask extends ProxyTaskHandler
      */
     public static function process($data): array
     {
-        $status     = $data['status'] ?? '';
-        $finishTime = $data['finish_time'] ?? '';
+        $status      = $data['status'] ?? '';
+        $finishTime  = $data['finish_time'] ?? '';
         $auditSource = $data['audit_source'] ?? 'business_key';
-        $audit = '';
-        switch ($auditSource){
+        $audit       = '';
+        switch ($auditSource) {
             case 'business_key':
-                $audit      = self::findByBusinessKey($data['key'] ?? 0);
-            break;
+                $audit = self::findByBusinessKey($data['key'] ?? 0);
+                break;
             case 'audit_id':
-                $audit      = self::findById($data['key'] ?? 0);
+                $audit = self::findById($data['key'] ?? 0);
+                break;
         }
-        if(!$audit){
-            throw new Exception("audit_source无法验证:".$auditSource);
+        if (!$audit) {
+            throw new Exception("audit_source无法验证:" . $auditSource);
         }
         switch ($status) {
             case Audit::BUSINESS_FAILURE:
