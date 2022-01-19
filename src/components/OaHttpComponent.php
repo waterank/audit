@@ -20,6 +20,7 @@ class OaHttpComponent implements OaComponentInterface
 
     /**
      * 创建OA审核单
+     *
      * @param $params
      * @param $auditType
      * @param $accessToken
@@ -34,6 +35,7 @@ class OaHttpComponent implements OaComponentInterface
 
     /**
      * 获取accessToken
+     *
      * @param $userId
      * @param $oaRefreshToken
      *
@@ -42,17 +44,20 @@ class OaHttpComponent implements OaComponentInterface
      */
     public function getAccessToken($userId, $oaRefreshToken)
     {
-        $accesInfo = $this->oaHttpClient->getAccessToken($userId,$oaRefreshToken);
-        if(isset($accesInfo['refresh_token'])){
-            Yii::$app->getCache()->set($userId . AuditService::$oaRefreshTokenKey,
-                $accesInfo['refresh_token'],60 * 60 * 24 * 13);
+        $accessInfo = $this->oaHttpClient->getAccessToken($userId, $oaRefreshToken);
+        if (!empty($accessInfo['refresh_token'])) {
+            Yii::$app->getCache()->set($userId . AuditService::$oaRefreshTokenKey, $accessInfo['refresh_token'],
+                60 * 60 * 24 * 13);
+            Yii::$app->getCache()->set($userId . AuditService::$oaAccessTokenKey, $accessInfo['access_token'] ?? '',
+                $accessInfo['expires_in'] ?? 0);
         }
 
-        return $accesInfo;
+        return $accessInfo;
     }
 
     /**
      * 获取跳转到OA授权URL
+     *
      * @param $cacheKey
      *
      * @return string
@@ -64,6 +69,7 @@ class OaHttpComponent implements OaComponentInterface
 
     /**
      * 获取refreToken
+     *
      * @param $code
      *
      * @return array
@@ -76,30 +82,34 @@ class OaHttpComponent implements OaComponentInterface
 
     /**
      * 获取OA客户端模式的认证TOKEN
+     *
      * @return array
      * @throws \Exception
      */
     public function getClientToken()
     {
-        $accesInfo =  $this->oaHttpClient->getClientToken();
-        return $accesInfo['access_token']?? '';
+        $accessInfo = $this->oaHttpClient->getClientToken();
+
+        return $accessInfo['access_token'] ?? '';
     }
 
 
     /**
      * 获取OA审核节点信息
+     *
      * @param $accessToken
      * @param $entry_ids
      *
      * @return array
      */
-    public function getOaNodeInfo($accessToken,$entry_ids)
+    public function getOaNodeInfo($accessToken, $entry_ids)
     {
-        return $this->oaHttpClient->getOaNodeInfo($accessToken,$entry_ids);
+        return $this->oaHttpClient->getOaNodeInfo($accessToken, $entry_ids);
     }
 
     /**
      * 获取OA审核单在配置中对应的业务类路径
+     *
      * @param $auditType
      *
      * @return mixed|string
@@ -111,6 +121,7 @@ class OaHttpComponent implements OaComponentInterface
 
     /**
      * 获取审核类型列表
+     *
      * @return mixed
      */
     public function getAuditTypeList()

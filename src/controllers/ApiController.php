@@ -58,6 +58,8 @@ class ApiController extends Controller
         if (!empty($response['refresh_token'])) {
             Yii::$app->getCache()->set($userId . AuditService::$oaRefreshTokenKey, $response['refresh_token'],
                 60 * 60 * 24 * 13);
+            Yii::$app->getCache()->set($userId . AuditService::$oaAccessTokenKey, $response['access_token'] ?? '',
+                $response['expires_in'] ?? 0);
         }
         //生成AUDIT数据 开启OA task
         $auditModelParams = [

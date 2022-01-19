@@ -12,6 +12,7 @@ class AuditService
 {
 
     public static $oaRefreshTokenKey = '_oa_refresh_token';
+    public static $oaAccessTokenKey = '_oa_access_token';
 
     /**
      * OA审核流程入口
@@ -23,7 +24,7 @@ class AuditService
      * @return \yii\console\Response|\yii\web\Response|string
      * @throws \yii\base\UserException
      */
-    public static function oaAudit($paramsKey, $auditType, $params, $custom = [],$returnUrl = false)
+    public static function oaAudit($paramsKey, $auditType, $params, $custom = [], $returnUrl = false)
     {
         $oaComponent = new OaHttpComponent();
         $userId      = Yii::$app->user->id;
@@ -36,10 +37,10 @@ class AuditService
             'user_email' => $userEmail,
         ];
         $cacheKey    = self::saveOaCache($userInfo, $paramsKey, $auditType, $request, $params, $custom);
-        $url = $oaComponent->getOaRedirectUrl($cacheKey);
-        if($returnUrl){
+        $url         = $oaComponent->getOaRedirectUrl($cacheKey);
+        if ($returnUrl) {
             return $url;
-        }else{
+        } else {
             return Yii::$app->getResponse()->redirect($url);
         }
     }

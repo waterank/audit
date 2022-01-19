@@ -15,25 +15,34 @@ class OaGenerateTask extends ProxyTaskHandler
 
     public static function process($data): array
     {
-        $oaComponent    = new OaHttpComponent();
-        $audit          = self::findByAuditId($data['dataId'] ?? 0);
-        $auditType      = $audit->audit_type;
-        $userId         = $audit->audit_creator_id;
-        $params = json_decode($audit->audit_oa_params, true);
-        if(isset($params['params'])){
-            $oaParams =  $params['params']['WorkflowApply'] ?? [];
-        }else{
+        $oaComponent = new OaHttpComponent();
+        $audit       = self::findByAuditId($data['dataId'] ?? 0);
+        $auditType   = $audit->audit_type;
+        $userId      = $audit->audit_creator_id;
+        $params      = json_decode($audit->audit_oa_params, true);
+        if (isset($params['params'])) {
+            $oaParams = $params['params']['WorkflowApply'] ?? [];
+        } else {
             $oaParams = $params;
         }
-        $oaRefreshToken = Yii::$app->getCache()->get($userId . AuditService::$oaRefreshTokenKey);
-        $accesInfo    = $oaComponent->getAccessToken($userId, $oaRefreshToken);
-        if (empty($accesInfo['access_token'])) {
-            throw new UserException("accesToken 获取失败:".json_encode($accesInfo, JSON_UNESCAPED_UNICODE).'accessToken:'.$oaRefreshToken);
+
+        $accessToken = Yii::$app->getCache()->get($userId . AuditService::$oaAccessTokenKey);
+        if (!$accessToken) {
+            $oaRefreshToken = Yii::$app->getCache()->get($userId . AuditService::$oaRefreshTokenKey);
+            if (!$oaRefreshToken) {
+                throw new UserException("refreshToken已经过期，请重新提交审核单");
+            }
+            $accessInfo = $oaComponent->getAccessToken($userId, $oaRefreshToken);
+            if (empty($accesInfo['access_token'])) {
+                throw new UserException("accessToken 获取失败:" . json_encode($accessInfo, JSON_UNESCAPED_UNICODE)
+                    . 'refreshToken:' . $oaRefreshToken);
+            }
+            $accessToken = $accesInfo['access_token'];
         }
-        $accessToken = $accesInfo['access_token'];
-        $oaResponse         = $oaComponent->createOa($oaParams, $auditType, $accessToken);
-        $oaId               = $oaResponse['entry_id'] ?? 0;
-        $audit->audit_oa_id = $oaId;
+
+        $oaResponse          = $oaComponent->createOa($oaParams, $auditType, $accessToken);
+        $oaId                = $oaResponse['entry_id'] ?? 0;
+        $audit->audit_oa_id  = $oaId;
         $audit->audit_status = Audit::STATUS_WAIT_OA_AUDIT;
         if (!$audit->save()) {
             throw new UserException(json_encode($audit->getErrors(), JSON_UNESCAPED_UNICODE));
