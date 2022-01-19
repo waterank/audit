@@ -133,7 +133,6 @@ class OaCapitalComponent implements OaComponentInterface
             'redirect_uri'  => $this->redirectUrl,
             'response_type' => $this->responseType,
             'scope'         => $this->scope,
-            'client_secret' => $this->clientSecret,
             'state'         => $cacheKey,
         ]);
 
