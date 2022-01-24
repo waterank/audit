@@ -108,12 +108,14 @@ class ApiController extends Controller
         $businessKey = $dataArray['business_key'] ?? '';
         $auditId     = $dataArray['audit_id'] ?? 0;
         $status      = $dataArray['status'] ?? '';
+        $memo        = $dataArray['memo'] ?? '';
         if (in_array($status, [Audit::BUSINESS_SUCCESS, Audit::BUSINESS_FAILURE])) {
             BusinessCallbackTask::make([
                 'key'          => $auditId,
                 'status'       => $status,
                 'finish_time'  => date("Y-m-d H:i:s"),
                 'audit_source' => 'audit_id',
+                'memo'         => $memo,
             ]);
         }
         Yii::$app->response->format = Response::FORMAT_JSON;

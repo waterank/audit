@@ -21,6 +21,7 @@ class BusinessCallbackTask extends ProxyTaskHandler
     {
         $status      = $data['status'] ?? '';
         $finishTime  = $data['finish_time'] ?? '';
+        $memo        = $data['memo'] ?? '';
         $auditSource = $data['audit_source'] ?? 'business_key';
         $audit       = '';
         switch ($auditSource) {
@@ -46,6 +47,9 @@ class BusinessCallbackTask extends ProxyTaskHandler
         }
         if ($finishTime) {
             $audit->business_finished_at = $finishTime;
+        }
+        if ($memo) {
+            $audit->business_note = $memo;
         }
         if (!$audit->save()) {
             throw new UserException(json_encode($audit->getErrors(), JSON_UNESCAPED_UNICODE));
