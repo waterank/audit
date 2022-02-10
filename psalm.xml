@@ -13,6 +13,8 @@
         <file name="tests/yii"/>
         <directory name="src" />
         <ignoreFiles>
+            <file name="src/components/OaCapitalComponent.php"/>
+            <file name="src/task/CapitalTaskProxyHandler.php"/>
             <directory name="vendor" />
             <directory name="tests"/>
             <directory name="src/views"/>

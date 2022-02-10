@@ -3,7 +3,6 @@
 namespace waterank\audit\models;
 
 use waterank\audit\components\OaHttpComponent;
-use Yii;
 
 /**
  * This is the model class for table "audit".
@@ -25,7 +24,7 @@ use Yii;
  * @property string|null $audit_oa_finished_at                   OA完成时间
  * @property string|null $business_finished_at                   业务完成时间
  */
-class Audit extends yii\db\ActiveRecord
+class Audit extends \yii\db\ActiveRecord
 {
 
     public const STATUS_NEW = 0;
