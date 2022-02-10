@@ -1,5 +1,6 @@
 {
   "name": "waterank/audit",
+  "type": "yii2-extension",
   "description": "kuainiu group audit component",
   "license": "MIT",
   "authors": [
@@ -10,19 +11,27 @@
   ],
   "require": {
     "php": ">=7.1.0",
-    "yiisoft/yii2": "^2.0",
-    "ext-json": "*"
-  },
-  "repositories": {
-    "composer": {
-      "type": "composer",
-      "url": "https://asset-packagist.org"
-    }
+    "ext-json": "*",
+    "xlerr/task-proxy": "^1.1",
+    "xlerr/yii2-common-widgets": "^1.8",
+    "yiisoft/yii2": "^2.0"
   },
   "autoload": {
     "psr-4": {
       "waterank\\audit\\": "src"
     }
   },
-  "minimum-stability": "stable"
+  "minimum-stability": "stable",
+  "config": {
+    "sort-packages": true,
+    "allow-plugins": {
+      "yiisoft/yii2-composer": true
+    }
+  },
+  "repositories": {
+    "composer": {
+      "type": "composer",
+      "url": "https://asset-packagist.org"
+    }
+  }
 }
