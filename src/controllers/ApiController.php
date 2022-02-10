@@ -2,12 +2,15 @@
 
 namespace waterank\audit\controllers;
 
+use Throwable;
 use waterank\audit\components\OaHttpComponent;
 use waterank\audit\models\Audit;
 use waterank\audit\service\AuditService;
 use waterank\audit\task\BusinessCallbackTask;
 use waterank\audit\task\OaCallbackTask;
 use Yii;
+use yii\base\UserException;
+use yii\db\Exception;
 use yii\rest\Controller;
 use yii\web\Response;
 
@@ -16,8 +19,9 @@ class ApiController extends Controller
     /**
      * OA授权回跳地址，并保存audit信息，并开启创建OA审核TASK
      *
-     * @return \yii\web\Response
-     * @throws \yii\base\UserException
+     * @return Response
+     * @throws UserException
+     * @throws Exception
      */
     public function actionOaRedirect()
     {
@@ -47,6 +51,7 @@ class ApiController extends Controller
         if (!$code && $error) { //拒绝的话原路跳回页面并渲染
             return $this->redirect($redirectInfo);
         }
+
         $oaComponent = new OaHttpComponent();
 
         $response = $oaComponent->getRefreshToken($code);
@@ -55,12 +60,10 @@ class ApiController extends Controller
 
             return $this->redirect($redirectInfo);
         }
-        if (!empty($response['refresh_token'])) {
-            Yii::$app->getCache()->set($userId . AuditService::$oaRefreshTokenKey, $response['refresh_token'],
-                60 * 60 * 24 * 13);
-            Yii::$app->getCache()->set($userId . AuditService::$oaAccessTokenKey, $response['access_token'] ?? '',
-                $response['expires_in'] ?? 0);
-        }
+
+        Yii::$app->getCache()->set($userId . AuditService::$oaRefreshTokenKey, $response['refresh_token'], 60 * 60 * 24 * 13);
+        Yii::$app->getCache()->set($userId . AuditService::$oaAccessTokenKey, $response['access_token'] ?? '', $response['expires_in'] ?? 0);
+
         //生成AUDIT数据 开启OA task
         $auditModelParams = [
             'audit_oa_params' => json_encode($params['value'] ?? [], JSON_UNESCAPED_UNICODE),
@@ -69,19 +72,20 @@ class ApiController extends Controller
             'user_email'      => $userEmail,
             'audit_type'      => $auditType,
         ];
-        AuditService::saveAuditGenerateOa($auditModelParams);
+
+        return AuditService::saveAuditGenerateOa($auditModelParams);
     }
 
     /**
      * OA审核通过或拒绝，回调API
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function actionOaCallback()
     {
-        $data       = file_get_contents('php://input');
-        $dataArray  = json_decode($data ?? '', true);
-        $eventData  = json_decode($dataArray['event_data'] ?? '', true);
+        $rawBody    = Yii::$app->getRequest()->getRawBody();
+        $dataArray  = (array)json_decode($rawBody, true);
+        $eventData  = (array)json_decode($dataArray['event_data'] ?? '', true);
         $id         = $eventData['entry']['entry_id'] ?? 0;
         $statusCode = $eventData['entry']['status_code'] ?? 0;
         if (in_array($statusCode, [Audit::OA_AGREE_STATUS, Audit::OA_REFUSE_STATUS])) {
@@ -99,12 +103,12 @@ class ApiController extends Controller
 
     /**
      * @return array
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function actionBusinessCallback()
     {
-        $data        = file_get_contents('php://input');
-        $dataArray   = json_decode($data ?? '', true);
+        $rawBody     = Yii::$app->getRequest()->getRawBody();
+        $dataArray   = (array)json_decode($rawBody, true);
         $businessKey = $dataArray['business_key'] ?? '';
         $auditId     = $dataArray['audit_id'] ?? 0;
         $status      = $dataArray['status'] ?? '';

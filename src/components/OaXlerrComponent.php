@@ -13,14 +13,13 @@ class OaXlerrComponent extends RequestClient implements OaComponentInterface
 {
     use ComponentTrait;
 
-    public string $oaUrl;
-
-    public int $clientId;
-    public string $redirectUrl;
-    public string $responseType;
-    public string $scope;
-    public string $clientSecret;
-    public array $oaConfig;
+    public $oaUrl;
+    public $clientId;
+    public $redirectUrl;
+    public $responseType;
+    public $scope;
+    public $clientSecret;
+    public $oaConfig;
 
     public function createOa($params, $auditType, $accessToken)
     {
