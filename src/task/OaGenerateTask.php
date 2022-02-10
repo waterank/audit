@@ -43,7 +43,7 @@ class OaGenerateTask extends ProxyTaskHandler
         if(empty($oaResponse['entry_id'])){
             throw new UserException('请求创建OA审核单接口失败'.json_encode($oaResponse, JSON_UNESCAPED_UNICODE));
         }
-        $oaId                = $oaResponse['entry_id'] ?? 0;
+        $oaId                = $oaResponse['entry_id'];
         $audit->audit_oa_id  = $oaId;
         $audit->audit_status = Audit::STATUS_WAIT_OA_AUDIT;
         if (!$audit->save()) {
