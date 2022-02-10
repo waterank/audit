@@ -8,7 +8,7 @@ use waterank\audit\models\Audit;
 use xlerr\proxy\task\ProxyTaskHandler;
 use yii\base\UserException;
 use yii\db\Exception;
-use yii;
+use Yii;
 
 class OaCallbackTask extends ProxyTaskHandler
 {

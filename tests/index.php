@@ -8,8 +8,8 @@ use yii\caching\FileCache;
 use yii\db\Connection;
 use yii\web\Application;
 
-define('YII_ENV', 'dev');
-define('YII_DEBUG', true);
+defined('YII_ENV') or define('YII_ENV', 'dev');
+defined('YII_DEBUG') or define('YII_DEBUG', true);
 
 require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../vendor/yiisoft/yii2/Yii.php';
@@ -68,7 +68,7 @@ $config = [
         'formatter'                       => [
             'as formatter' => FormatterBehavior::class,
         ],
-        OaXlerrComponent::componentName() => function () {
+        OaXlerrComponent::componentName() => function (): OaXlerrComponent {
 
             $config = [
                 "oauth"         => [
@@ -100,5 +100,4 @@ $config = [
     ],
 ];
 
-$app = new Application($config);
-$app->run();
+(new Application($config))->run();

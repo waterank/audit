@@ -8,7 +8,7 @@ use waterank\audit\service\AuditService;
 use xlerr\proxy\task\ProxyTaskHandler;
 use yii\base\UserException;
 use yii\db\Exception;
-use yii;
+use Yii;
 
 class OaGenerateTask extends ProxyTaskHandler
 {

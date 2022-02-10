@@ -3,7 +3,7 @@
 namespace waterank\audit\models;
 
 use waterank\audit\components\OaHttpComponent;
-use yii;
+use Yii;
 
 /**
  * This is the model class for table "audit".

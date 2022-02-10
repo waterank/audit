@@ -2,13 +2,10 @@
 
 namespace waterank\audit\task;
 
-use waterank\audit\business\BusinessInterface;
-use waterank\audit\components\OaHttpComponent;
 use waterank\audit\models\Audit;
 use xlerr\proxy\task\ProxyTaskHandler;
 use yii\base\UserException;
 use yii\db\Exception;
-use yii;
 
 class BusinessCallbackTask extends ProxyTaskHandler
 {

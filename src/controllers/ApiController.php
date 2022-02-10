@@ -7,7 +7,7 @@ use waterank\audit\models\Audit;
 use waterank\audit\service\AuditService;
 use waterank\audit\task\BusinessCallbackTask;
 use waterank\audit\task\OaCallbackTask;
-use yii;
+use Yii;
 use yii\rest\Controller;
 use yii\web\Response;
 
