@@ -2,8 +2,10 @@
 
 namespace waterank\audit\components;
 
+use Exception;
 use waterank\audit\service\AuditService;
-use yii;
+use Yii;
+use yii\base\UserException;
 
 class OaHttpComponent implements OaComponentInterface
 {
@@ -23,10 +25,10 @@ class OaHttpComponent implements OaComponentInterface
      *
      * @param $params
      * @param $auditType
-     * @param $accessToken
+     * @param $accesToken
      *
      * @return array
-     * @throws \Exception
+     * @throws UserException
      */
     public function createOa($params, $auditType, $accesToken)
     {
@@ -40,7 +42,7 @@ class OaHttpComponent implements OaComponentInterface
      * @param $oaRefreshToken
      *
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function getAccessToken($userId, $oaRefreshToken)
     {
@@ -73,7 +75,7 @@ class OaHttpComponent implements OaComponentInterface
      * @param $code
      *
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function getRefreshToken($code)
     {
@@ -84,7 +86,7 @@ class OaHttpComponent implements OaComponentInterface
      * 获取OA客户端模式的认证TOKEN
      *
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function getClientToken()
     {

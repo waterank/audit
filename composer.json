@@ -25,7 +25,8 @@
   "config": {
     "sort-packages": true,
     "allow-plugins": {
-      "yiisoft/yii2-composer": true
+      "yiisoft/yii2-composer": true,
+      "composer/package-versions-deprecated": true
     }
   },
   "repositories": {
@@ -33,5 +34,13 @@
       "type": "composer",
       "url": "https://asset-packagist.org"
     }
+  },
+  "require-dev": {
+    "symfony/var-dumper": "^5.4",
+    "vimeo/psalm": "^4.20",
+    "xlerr/httpca": "^1.1",
+    "xlerr/task": "^2.0",
+    "yiisoft/yii2-debug": "^2.1",
+    "yiisoft/yii2-gii": "^2.2"
   }
 }

@@ -33,11 +33,11 @@ class OaGenerateTask extends ProxyTaskHandler
                 throw new UserException("refreshToken已经过期，请重新提交审核单");
             }
             $accessInfo = $oaComponent->getAccessToken($userId, $oaRefreshToken);
-            if (empty($accesInfo['access_token'])) {
+            if (empty($accessInfo['access_token'])) {
                 throw new UserException("accessToken 获取失败:" . json_encode($accessInfo, JSON_UNESCAPED_UNICODE)
                     . 'refreshToken:' . $oaRefreshToken);
             }
-            $accessToken = $accesInfo['access_token'];
+            $accessToken = $accessInfo['access_token'];
         }
 
         $oaResponse          = $oaComponent->createOa($oaParams, $auditType, $accessToken);
