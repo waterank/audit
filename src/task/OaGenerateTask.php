@@ -12,7 +12,6 @@ use yii;
 
 class OaGenerateTask extends ProxyTaskHandler
 {
-
     public static function process($data): array
     {
         $oaComponent = new OaHttpComponent();
