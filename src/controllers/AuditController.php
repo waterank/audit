@@ -5,7 +5,7 @@ namespace waterank\audit\controllers;
 use waterank\audit\models\Audit;
 use waterank\audit\models\AuditSearch;
 use yii\web\Controller;
-use yii;
+use Yii;
 use yii\web\NotFoundHttpException;
 
 class AuditController extends Controller

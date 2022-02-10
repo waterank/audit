@@ -25,14 +25,14 @@ class OaHttpComponent implements OaComponentInterface
      *
      * @param $params
      * @param $auditType
-     * @param $accesToken
+     * @param $accessToken
      *
      * @return array
      * @throws UserException
      */
-    public function createOa($params, $auditType, $accesToken)
+    public function createOa($params, $auditType, $accessToken)
     {
-        return $this->oaHttpClient->createOa($params, $auditType, $accesToken);
+        return $this->oaHttpClient->createOa($params, $auditType, $accessToken);
     }
 
     /**
@@ -85,7 +85,7 @@ class OaHttpComponent implements OaComponentInterface
     /**
      * 获取OA客户端模式的认证TOKEN
      *
-     * @return array
+     * @return string
      * @throws Exception
      */
     public function getClientToken()

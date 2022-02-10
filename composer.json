@@ -21,6 +21,11 @@
       "waterank\\audit\\": "src"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "waterank\\tests\\": "tests"
+    }
+  },
   "minimum-stability": "stable",
   "config": {
     "sort-packages": true,

@@ -5,7 +5,7 @@ namespace waterank\audit\service;
 use waterank\audit\components\OaHttpComponent;
 use waterank\audit\models\Audit;
 use waterank\audit\task\OaGenerateTask;
-use yii;
+use Yii;
 use yii\base\UserException;
 
 class AuditService

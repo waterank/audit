@@ -1,14 +1,17 @@
 <?xml version="1.0"?>
 <psalm
-    errorLevel="8"
+    errorLevel="6"
     resolveFromConfigFile="true"
+    useDocblockTypes="true"
+    cacheDirectory="tests/runtime/psalm/cache/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="https://getpsalm.org/schema/config"
     xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
 >
     <projectFiles>
-        <directory name="src" />
         <file name="tests/index.php"/>
+        <file name="tests/yii"/>
+        <directory name="src" />
         <ignoreFiles>
             <directory name="vendor" />
             <directory name="tests"/>
