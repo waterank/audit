@@ -1,0 +1,59 @@
+#!/usr/bin/env php
+<?php
+
+use xlerr\common\behaviors\FormatterBehavior;
+use xlerr\task\console\TaskController;
+use yii\caching\FileCache;
+use yii\console\Application;
+use yii\db\Connection;
+
+define('YII_ENV', 'dev');
+define('YII_DEBUG', true);
+
+require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../vendor/yiisoft/yii2/Yii.php';
+
+$config = [
+    'id'                  => 'demo_console',
+    'name'                => 'demo console',
+    'basePath'            => __DIR__,
+    'controllerNamespace' => 'console',
+    'controllerMap'       => [
+        'task' => TaskController::class,
+    ],
+    'aliases'             => [
+        '@console' => __DIR__ . '/console',
+    ],
+    'components'          => [
+        'db'        => [
+            'class'             => Connection::class,
+            'enableSchemaCache' => false,
+            'masters'           => [
+                ['dsn' => 'mysql:host=mysql;dbname=biz2'],
+            ],
+            'masterConfig'      => [
+                'username' => 'root',
+                'password' => 'adminqwer',
+                'charset'  => 'utf8',
+            ],
+            //            'slaves'            => [
+            //                ['dsn' => 'mysql:host=mysql;dbname=biz2'],
+            //                ['dsn' => 'mysql:host=mysql;dbname=biz2'],
+            //            ],
+            //            'slaveConfig'       => [
+            //                'username' => 'root',
+            //                'password' => 'adminqwer',
+            //                'charset'  => 'utf8',
+            //            ],
+        ],
+        'cache'     => [
+            'class' => FileCache::class,
+        ],
+        'formatter' => [
+            'as formatter' => FormatterBehavior::class,
+        ],
+    ],
+];
+
+$app = new Application($config);
+exit($app->run());
