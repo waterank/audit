@@ -2,80 +2,68 @@
 
 namespace waterank\audit\service;
 
+use Throwable;
 use waterank\audit\components\OaHttpComponent;
 use waterank\audit\models\Audit;
 use waterank\audit\task\OaGenerateTask;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\base\UserException;
+use yii\web\Application;
+use yii\web\Response;
 
 class AuditService
 {
-
     public static $oaRefreshTokenKey = '_oa_refresh_token';
     public static $oaAccessTokenKey = '_oa_access_token';
 
     /**
      * OA审核流程入口
      *
-     * @param $paramsKey
-     * @param $auditType
-     * @param $params
+     * @param string $paramsKey
+     * @param string $auditType
+     * @param mixed  $params
+     * @param array  $custom
+     * @param bool   $returnUrl
      *
-     * @return \yii\console\Response|\yii\web\Response|string
-     * @throws \yii\base\UserException
+     * @return Response|string
+     * @throws InvalidConfigException
+     * @throws UserException
      */
     public static function oaAudit($paramsKey, $auditType, $params, $custom = [], $returnUrl = false)
     {
-        $oaComponent = new OaHttpComponent();
-        $userId      = Yii::$app->user->id;
-        $userName    = Yii::$app->user->identity->fullname;
-        $userEmail   = Yii::$app->user->identity->email;
-        $request     = Yii::$app->request;
-        $userInfo    = [
-            'user_id'    => $userId,
-            'user_name'  => $userName,
-            'user_email' => $userEmail,
-        ];
-        $cacheKey    = self::saveOaCache($userInfo, $paramsKey, $auditType, $request, $params, $custom);
-        $url         = $oaComponent->getOaRedirectUrl($cacheKey);
-        if ($returnUrl) {
-            return $url;
-        } else {
-            return Yii::$app->getResponse()->redirect($url);
+        $app = Yii::$app;
+        if (!$app instanceof Application) {
+            throw new UserException('只能在页面中创建审核单');
         }
-    }
 
-    /**
-     * 将OA审核信息保存到缓存 供OA授权完成后跳转地址使用  \waterank\\audit\\controllers\ApiController actionOaRedirect
-     *
-     * @param array $userInfo
-     * @param       $paramsKey
-     * @param       $auditType
-     * @param       $request
-     * @param       $params
-     *
-     * @return string
-     */
-    public static function saveOaCache(array $userInfo, $paramsKey, $auditType, $request, $params, $custom = [])
-    {
-        $cacheKey  = $userInfo['user_id'] . '_' . time();
         $cacheInfo = [
             'params'     => [
                 'key'   => $paramsKey,
                 'value' => $params,
-                'route' => '/' . $request->getPathInfo(),
+                'route' => '/' . $app->request->getPathInfo(),
             ],
-            'user_info'  => $userInfo,
+            'user_info'  => [
+                'user_id'    => $app->user->id,
+                'user_name'  => $app->user->identity->fullname,
+                'user_email' => $app->user->identity->email,
+            ],
             'audit_type' => $auditType,
         ];
         if ($custom) {
             $cacheInfo['custom'] = $custom;
         }
-        Yii::$app->getCache()->set($cacheKey, $cacheInfo, 60 * 60);
 
-        return $cacheKey;
+        $cacheKey = $app->user->id . '_' . uuid_create();
+
+        if (!$app->getCache()->set($cacheKey, $cacheInfo, 60 * 60)) {
+            throw new UserException('缓存审核数据失败');
+        }
+
+        $url = (new OaHttpComponent())->getOaRedirectUrl($cacheKey);
+
+        return $returnUrl ? $url : $app->response->redirect($url);
     }
-
 
     /**
      * 判断OA的refreshToken是否过期
@@ -92,10 +80,10 @@ class AuditService
     /**
      * 生成AUDIT审核表数据 并开启创建OA审核单异步TASK
      *
-     * @param $auditModelParams
+     * @param array $auditModelParams
      *
-     * @throws \yii\base\UserException
-     * @throws \yii\db\Exception
+     * @return Response
+     * @throws UserException
      */
     public static function saveAuditGenerateOa($auditModelParams)
     {
@@ -117,14 +105,13 @@ class AuditService
                 throw new UserException(json_encode($audit->getErrors(), JSON_UNESCAPED_UNICODE));
             }
             $transaction->commit();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $transaction->rollBack();
             throw new UserException(json_encode($e->getMessage(), JSON_UNESCAPED_UNICODE));
         }
         Yii::$app->session->addFlash("success", "你已成功提交，需要先经过OA审核，请在此审核列表</a>中查看进度");
 
-//        return  Yii::$app->getResponse()->redirect($auditModelParams['referrer']);
+        //        return  Yii::$app->getResponse()->redirect($auditModelParams['referrer']);
         return Yii::$app->getResponse()->redirect('/audit/audit/index');
     }
-
 }
