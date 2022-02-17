@@ -21,7 +21,7 @@ class OaHttpComponent implements OaComponentInterface
     }
 
     /**
-     * 创建OA审核单
+     * 创建OA审核单（单个）
      *
      * @param $params
      * @param $auditType
@@ -33,6 +33,21 @@ class OaHttpComponent implements OaComponentInterface
     public function createOa($params, $auditType, $accessToken)
     {
         return $this->oaHttpClient->createOa($params, $auditType, $accessToken);
+    }
+
+    /**
+     * 创建OA审核单（内包含多条数据的表格）
+     *
+     * @param $params
+     * @param $auditType
+     * @param $accessToken
+     *
+     * @return array
+     * @throws UserException
+     */
+    public function createBulkOa($params, $auditType, $accessToken)
+    {
+        return $this->oaHttpClient->createBulkOa($params, $auditType, $accessToken);
     }
 
     /**

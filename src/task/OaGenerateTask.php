@@ -38,8 +38,11 @@ class OaGenerateTask extends ProxyTaskHandler
             }
             $accessToken = $accessInfo['access_token'];
         }
-
-        $oaResponse          = $oaComponent->createOa($oaParams, $auditType, $accessToken);
+        if(stristr($auditType,'bulk')){
+            $oaResponse          = $oaComponent->createBulkOa($oaParams, $auditType, $accessToken);
+        }else{
+            $oaResponse          = $oaComponent->createOa($oaParams, $auditType, $accessToken);
+        }
         if(empty($oaResponse['entry_id'])){
             throw new UserException('请求创建OA审核单接口失败'.json_encode($oaResponse, JSON_UNESCAPED_UNICODE));
         }

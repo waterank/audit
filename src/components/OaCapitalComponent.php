@@ -68,6 +68,42 @@ class OaCapitalComponent implements OaComponentInterface
     }
 
     /**
+     * 创建OA审核单(内包含多条数据的表格)
+     *
+     * @param $params
+     * @param $auditType
+     * @param $accessToken
+     *
+     * @return array
+     * @throws \Exception
+     */
+    public function createBulkOa($params, $auditType, $accessToken)
+    {
+        $oaTemplate = $this->oaConfig[$auditType]['flow_key'] ?? '';
+        if (!$oaTemplate) {
+            throw new UserException("找不到flow_key");
+        }
+        $responseRaw = RestHelper::postWithJson($this->oaUrl . '/openapi/approval/create',
+            json_encode(
+                [
+                    'flow_key'   => $oaTemplate,
+                    'tpl' => $params,
+                ]
+            ),
+            [
+                CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'Authorization:Bearer ' . $accessToken],
+                CURLOPT_HEADER     => 0,
+            ]
+        );
+        $response    = (array)json_decode($responseRaw, true);
+        if (!empty($response['code'])) {
+            throw new UserException($responseRaw);
+        }
+
+        return (array)json_decode($response['data'] ?? '', true);
+    }
+
+    /**
      * 获取accessToken
      *
      * @param $userId
