@@ -44,9 +44,9 @@ class AuditService
                 'route' => '/' . $app->request->getPathInfo(),
             ],
             'user_info'  => [
-                'user_id'    => $app->user->id,
-                'user_name'  => $app->user->identity->fullname,
-                'user_email' => $app->user->identity->email,
+                'user_id'    => $app->user->id ?? 0,
+                'user_name'  => $app->user->identity->fullname ?? '',
+                'user_email' => $app->user->identity->email ?? '',
             ],
             'audit_type' => $auditType,
         ];
