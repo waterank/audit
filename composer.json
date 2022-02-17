@@ -13,7 +13,7 @@
     "php": ">=7.1.0",
     "ext-json": "*",
     "xlerr/task-proxy": "^1.1",
-    "xlerr/yii2-common-widgets": "^1.8",
+    "xlerr/yii2-common-widgets": "^1.6",
     "yiisoft/yii2": "^2.0"
   },
   "autoload": {
