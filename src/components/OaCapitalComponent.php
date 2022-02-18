@@ -87,7 +87,9 @@ class OaCapitalComponent implements OaComponentInterface
             json_encode(
                 [
                     'flow_key'   => $oaTemplate,
-                    'tpl' => $params,
+                    'entry_data' => [
+                        'form'=>$params
+                    ],
                 ]
             ),
             [
