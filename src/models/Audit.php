@@ -12,6 +12,7 @@ use waterank\audit\components\OaHttpComponent;
  * @property int         $audit_status                           审核状态
  * @property string      $audit_type                             审核类型
  * @property int         $business_status                        业务状态
+ * @property string      $business_status_detail                 业务状态详细信息
  * @property string      $business_note                          业务备注
  * @property string      $business_key                           业务KEY
  * @property int         $audit_creator_id                       创建人ID
@@ -35,23 +36,23 @@ class Audit extends \yii\db\ActiveRecord
 
     public const BUSINESS_NO_PROCESS = 0;
     public const BUSINESS_PROCESSING = 1;
-    public const BUSINESS_SUCCESS = 2;
+    public const BUSINESS_END = 2;
     public const BUSINESS_FAILURE = 3;
 
     public const OA_AGREE_STATUS = 9;
     public const OA_REFUSE_STATUS = -3;
 
     const OA_STATUS_LIST = [
-        self::STATUS_PROCESSING => '创建OA单中',
-        self::STATUS_SUCCESS    => '审核通过',
-        self::STATUS_FAILURE    => '审核拒绝',
-        self::STATUS_WAIT_OA_AUDIT    => '等待OA审核',
+        self::STATUS_PROCESSING    => '创建OA单中',
+        self::STATUS_SUCCESS       => '审核通过',
+        self::STATUS_FAILURE       => '审核拒绝',
+        self::STATUS_WAIT_OA_AUDIT => '等待OA审核',
     ];
 
     const BUSINESS_STATUS_LIST = [
         self::BUSINESS_NO_PROCESS => '业务未处理',
         self::BUSINESS_PROCESSING => '业务处理中',
-        self::BUSINESS_SUCCESS    => '业务已结束',
+        self::BUSINESS_END        => '业务已结束',
         self::BUSINESS_FAILURE    => '业务处理失败，等待重试',
     ];
 
