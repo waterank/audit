@@ -61,8 +61,10 @@ class ApiController extends Controller
             return $this->redirect($redirectInfo);
         }
 
-        Yii::$app->getCache()->set($userId . AuditService::$oaRefreshTokenKey, $response['refresh_token'], 60 * 60 * 24 * 13);
-        Yii::$app->getCache()->set($userId . AuditService::$oaAccessTokenKey, $response['access_token'] ?? '', $response['expires_in'] ?? 0);
+        Yii::$app->getCache()->set($userId . AuditService::$oaRefreshTokenKey, $response['refresh_token'],
+            60 * 60 * 24 * 13);
+        Yii::$app->getCache()->set($userId . AuditService::$oaAccessTokenKey, $response['access_token'] ?? '',
+            $response['expires_in'] ?? 0);
 
         //生成AUDIT数据 开启OA task
         $auditModelParams = [
@@ -107,19 +109,21 @@ class ApiController extends Controller
      */
     public function actionBusinessCallback()
     {
-        $rawBody     = Yii::$app->getRequest()->getRawBody();
-        $dataArray   = (array)json_decode($rawBody, true);
-        $businessKey = $dataArray['business_key'] ?? '';
-        $auditId     = $dataArray['audit_id'] ?? 0;
-        $status      = $dataArray['status'] ?? '';
-        $memo        = $dataArray['memo'] ?? '';
-        if (in_array($status, [Audit::BUSINESS_SUCCESS, Audit::BUSINESS_FAILURE])) {
+        $rawBody      = Yii::$app->getRequest()->getRawBody();
+        $dataArray    = (array)json_decode($rawBody, true);
+        $businessKey  = $dataArray['business_key'] ?? '';
+        $auditId      = $dataArray['audit_id'] ?? 0;
+        $status       = $dataArray['status'] ?? '';
+        $memo         = $dataArray['memo'] ?? '';
+        $statusDetail = $dataArray['status_detail'] ?? '';
+        if (in_array($status, [Audit::BUSINESS_END, Audit::BUSINESS_FAILURE])) {
             BusinessCallbackTask::make([
-                'key'          => $auditId,
-                'status'       => $status,
-                'finish_time'  => date("Y-m-d H:i:s"),
-                'audit_source' => 'audit_id',
-                'memo'         => $memo,
+                'key'           => $auditId,
+                'status'        => $status,
+                'finish_time'   => date("Y-m-d H:i:s"),
+                'audit_source'  => 'audit_id',
+                'memo'          => $memo,
+                'status_detail' => $statusDetail,
             ]);
         }
         Yii::$app->response->format = Response::FORMAT_JSON;

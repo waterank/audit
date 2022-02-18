@@ -16,11 +16,12 @@ class BusinessCallbackTask extends ProxyTaskHandler
      */
     public static function process($data): array
     {
-        $status      = $data['status'] ?? '';
-        $finishTime  = $data['finish_time'] ?? '';
-        $memo        = $data['memo'] ?? '';
-        $auditSource = $data['audit_source'] ?? 'business_key';
-        $audit       = '';
+        $status       = $data['status'] ?? '';
+        $finishTime   = $data['finish_time'] ?? '';
+        $memo         = $data['memo'] ?? '';
+        $statusDetail = $data['status_detail'] ?? '';
+        $auditSource  = $data['audit_source'] ?? 'business_key';
+        $audit        = '';
         switch ($auditSource) {
             case 'business_key':
                 $audit = self::findByBusinessKey($data['key'] ?? 0);
@@ -36,8 +37,8 @@ class BusinessCallbackTask extends ProxyTaskHandler
             case Audit::BUSINESS_FAILURE:
                 $audit->business_status = Audit::BUSINESS_FAILURE;
                 break;
-            case Audit::BUSINESS_SUCCESS:
-                $audit->business_status = Audit::BUSINESS_SUCCESS;
+            case Audit::BUSINESS_END:
+                $audit->business_status = Audit::BUSINESS_END;
                 break;
             default:
                 $audit->business_status = Audit::BUSINESS_FAILURE;
@@ -48,8 +49,13 @@ class BusinessCallbackTask extends ProxyTaskHandler
         if ($memo) {
             $audit->business_note = $memo;
         }
-        if (!$audit->save()) {
-            throw new UserException(json_encode($audit->getErrors(), JSON_UNESCAPED_UNICODE));
+        if ($statusDetail) {
+            $audit->business_status_detail = $statusDetail;
+        }
+        {
+            if (!$audit->save()) {
+                throw new UserException(json_encode($audit->getErrors(), JSON_UNESCAPED_UNICODE));
+            }
         }
 
         return [
