@@ -116,11 +116,12 @@ class ApiController extends Controller
         $status       = $dataArray['status'] ?? '';
         $memo         = $dataArray['memo'] ?? '';
         $statusDetail = $dataArray['status_detail'] ?? '';
+        $finishTime   = $dataArray['finish_time'] ?? '';
         if (in_array($status, [Audit::BUSINESS_END, Audit::BUSINESS_FAILURE])) {
             BusinessCallbackTask::make([
                 'key'           => $auditId,
                 'status'        => $status,
-                'finish_time'   => date("Y-m-d H:i:s"),
+                'finish_time'   => $finishTime ?:date("Y-m-d H:i:s"),
                 'audit_source'  => 'audit_id',
                 'memo'          => $memo,
                 'status_detail' => $statusDetail,
