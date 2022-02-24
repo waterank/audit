@@ -41,13 +41,30 @@ class OaHttpComponent implements OaComponentInterface
      * @param $params
      * @param $auditType
      * @param $accessToken
+     * @param $setTotalConfig
      *
      * @return array
      * @throws UserException
      */
-    public function createBulkOa($params, $auditType, $accessToken)
+    public function createBulkOa($params, $auditType, $accessToken,$setTotalConfig = [])
     {
-        return $this->oaHttpClient->createBulkOa($params, $auditType, $accessToken);
+        if(!$setTotalConfig){
+            $params = [
+                'form'=>$params
+            ];
+        }else{
+            $attribute = $setTotalConfig['attribute'] ?? '';
+            $total = 0;
+            foreach ($params as $param) {
+                $total += $param[$attribute] ?? 0;
+            }
+            $params = [
+                'form'=>$params,
+                'total_amount'=>$total
+            ];
+        }
+
+        return $this->oaHttpClient->createBulkOa($params, $auditType, $accessToken, []);
     }
 
     /**

@@ -6,7 +6,7 @@ interface OaComponentInterface
 {
     public function createOa($params, $auditType, $accessToken);
 
-    public function createBulkOa($params, $auditType, $accessToken);
+    public function createBulkOa($params, $auditType, $accessToken, $setTotalConfig = []);
 
     public function getAccessToken($userId, $oaRefreshToken);
 

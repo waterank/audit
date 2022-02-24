@@ -77,7 +77,7 @@ class OaCapitalComponent implements OaComponentInterface
      * @return array
      * @throws \Exception
      */
-    public function createBulkOa($params, $auditType, $accessToken)
+    public function createBulkOa($params, $auditType, $accessToken,$setTotalConfig = [])
     {
         $oaTemplate = $this->oaConfig[$auditType]['flow_key'] ?? '';
         if (!$oaTemplate) {
@@ -87,9 +87,7 @@ class OaCapitalComponent implements OaComponentInterface
             json_encode(
                 [
                     'flow_key'   => $oaTemplate,
-                    'entry_data' => [
-                        'form'=>$params
-                    ],
+                    'entry_data' => $params,
                 ]
             ),
             [

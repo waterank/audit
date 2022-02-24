@@ -39,7 +39,14 @@ class OaGenerateTask extends ProxyTaskHandler
             $accessToken = $accessInfo['access_token'];
         }
         if(stristr($auditType,'bulk')){
-            $oaResponse          = $oaComponent->createBulkOa($oaParams, $auditType, $accessToken);
+            if(in_array($auditType,['bulk_transfer','bulk_withdraw'])){
+                $setTotalConfig = [
+                    'attribute'=>'clearing_manual_amount'
+                ];
+                $oaResponse          = $oaComponent->createBulkOa($oaParams, $auditType, $accessToken,$setTotalConfig);
+            }else{
+                $oaResponse          = $oaComponent->createBulkOa($oaParams, $auditType, $accessToken);
+            }
         }else{
             $oaResponse          = $oaComponent->createOa($oaParams, $auditType, $accessToken);
         }

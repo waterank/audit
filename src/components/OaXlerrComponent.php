@@ -45,7 +45,7 @@ class OaXlerrComponent extends RequestClient implements OaComponentInterface
         return (array)json_decode($response['data'] ?? '', true);
     }
 
-    public function createBulkOa($params, $auditType, $accessToken)
+    public function createBulkOa($params, $auditType, $accessToken, $setTotalConfig = [])
     {
         $oaTemplate = $this->oaConfig[$auditType]['flow_key'] ?? '';
         if (!$oaTemplate) {
@@ -55,7 +55,7 @@ class OaXlerrComponent extends RequestClient implements OaComponentInterface
         $this->post('openapi/approval/create', [
             RequestOptions::JSON    => [
                 'flow_key'   => $oaTemplate,
-                'tpl' => $params,
+                'entry_data' => $params,
             ],
             RequestOptions::HEADERS => [
                 'Content-Type'  => 'application/json',
@@ -146,8 +146,8 @@ class OaXlerrComponent extends RequestClient implements OaComponentInterface
                 'Authorization' => 'Bearer ' . $accessToken,
             ],
         ]);
-        return $this->getResponse();
 
+        return $this->getResponse();
     }
 
     /**
