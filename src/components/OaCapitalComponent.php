@@ -77,7 +77,7 @@ class OaCapitalComponent implements OaComponentInterface
      * @return array
      * @throws \Exception
      */
-    public function createBulkOa($params, $auditType, $accessToken,$setTotalConfig = [])
+    public function createBulkOa($params, $auditType, $accessToken,$customConfig = [])
     {
         $oaTemplate = $this->oaConfig[$auditType]['flow_key'] ?? '';
         if (!$oaTemplate) {

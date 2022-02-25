@@ -41,30 +41,46 @@ class OaHttpComponent implements OaComponentInterface
      * @param $params
      * @param $auditType
      * @param $accessToken
-     * @param $setTotalConfig
+     * @param $customConfig
      *
      * @return array
      * @throws UserException
      */
-    public function createBulkOa($params, $auditType, $accessToken,$setTotalConfig = [])
+    public function createBulkOa($params, $auditType, $accessToken, $customConfig = [])
     {
-        if(!$setTotalConfig){
-            $params = [
-                'form'=>$params
-            ];
-        }else{
-            $attribute = $setTotalConfig['attribute'] ?? '';
-            $total = 0;
-            foreach ($params as $param) {
-                $total += $param[$attribute] ?? 0;
+        $renderParams = [
+            'form' => $params,
+        ];
+        if ($customConfig) {
+            foreach ($customConfig as $item) {
+                if (!isset($item['type'])) {
+                    continue;
+                }
+                switch ($item['type']) {
+                    case 'total':
+                        $attribute = $item['attribute'] ?? '';
+                        $total     = 0;
+                        foreach ($params as $param) {
+                            $total += $param[$attribute] ?? 0;
+                        }
+                        $renderParams['total_amount'] = $total;
+                        break;
+                    case 'f2y':
+                        $f2yParams = $params;
+                        $attribute = $item['attribute'] ?? '';
+                        foreach ($f2yParams as $k => $f2YParam) {
+                            if(isset($f2YParam[$attribute])){
+                                $f2yParams[$k][$attribute] = round($f2YParam[$attribute] / 100, 2);
+
+                            }
+                        }
+                        $renderParams['form'] = $f2yParams;
+                        break;
+                }
             }
-            $params = [
-                'form'=>$params,
-                'total_amount'=>$total
-            ];
         }
 
-        return $this->oaHttpClient->createBulkOa($params, $auditType, $accessToken, []);
+        return $this->oaHttpClient->createBulkOa($renderParams, $auditType, $accessToken, []);
     }
 
     /**

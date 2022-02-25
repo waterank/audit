@@ -38,20 +38,27 @@ class OaGenerateTask extends ProxyTaskHandler
             }
             $accessToken = $accessInfo['access_token'];
         }
-        if(stristr($auditType,'bulk')){
-            if(in_array($auditType,['bulk_transfer','bulk_withdraw'])){
-                $setTotalConfig = [
-                    'attribute'=>'clearing_manual_amount'
+        if (stristr($auditType, 'bulk')) {
+            if (in_array($auditType, ['bulk_transfer', 'bulk_withdraw'])) {
+                $customConfig = [
+                    [
+                        'type'      => 'total',
+                        'attribute' => 'clearing_manual_amount',
+                    ],
+                    [
+                        'type'      => 'f2y',
+                        'attribute' => 'clearing_manual_amount',
+                    ],
                 ];
-                $oaResponse          = $oaComponent->createBulkOa($oaParams, $auditType, $accessToken,$setTotalConfig);
-            }else{
-                $oaResponse          = $oaComponent->createBulkOa($oaParams, $auditType, $accessToken);
+                $oaResponse   = $oaComponent->createBulkOa($oaParams, $auditType, $accessToken, $customConfig);
+            } else {
+                $oaResponse = $oaComponent->createBulkOa($oaParams, $auditType, $accessToken);
             }
-        }else{
-            $oaResponse          = $oaComponent->createOa($oaParams, $auditType, $accessToken);
+        } else {
+            $oaResponse = $oaComponent->createOa($oaParams, $auditType, $accessToken);
         }
-        if(empty($oaResponse['entry_id'])){
-            throw new UserException('请求创建OA审核单接口失败'.json_encode($oaResponse, JSON_UNESCAPED_UNICODE));
+        if (empty($oaResponse['entry_id'])) {
+            throw new UserException('请求创建OA审核单接口失败' . json_encode($oaResponse, JSON_UNESCAPED_UNICODE));
         }
         $oaId                = $oaResponse['entry_id'];
         $audit->audit_oa_id  = $oaId;
