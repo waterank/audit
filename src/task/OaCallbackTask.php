@@ -93,11 +93,8 @@ class OaCallbackTask extends ProxyTaskHandler
         ];
     }
 
-    public static function findByOaId($id): Audit
+    public static function findByOaId($id)
     {
-        $audit = Audit::findOne(['audit_oa_id' => $id]);
-
-
-        return $audit;
+        return  Audit::findOne(['audit_oa_id' => $id]);
     }
 }
