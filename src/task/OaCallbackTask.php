@@ -19,6 +19,24 @@ class OaCallbackTask extends ProxyTaskHandler
         $status      = $data['status'] ?? '';
         $oaID        = $data['dataId'] ?? 0;
         $audit       = self::findByOaId($oaID);
+        $keyValue  = null;
+        if (class_exists('\\common\\models\\KeyValue')) {
+            $keyValue = new \common\models\KeyValue();
+        } elseif (class_exists('\\kvmanager\\models\\KeyValue')) {
+            $keyValue = new \kvmanager\models\KeyValue();
+        }
+        if(!$keyValue){
+            throw new Exception("找不到KeyValue类");
+        }
+        $config = $keyValue::takeAsArray('oa_oauth_config');
+        $auditThrowFlag = $config['audit_throw_flag'] ?? true;
+        if (!$audit) {
+            if($auditThrowFlag){
+                throw new Exception("审核数据不存在!");
+            }else{
+                return ['code' => '0', 'message' => 'ok'];
+            }
+        }
         if (isset($audit->audit_status)
             && $audit->audit_status != Audit::STATUS_WAIT_OA_AUDIT
         ) {
@@ -78,9 +96,7 @@ class OaCallbackTask extends ProxyTaskHandler
     public static function findByOaId($id): Audit
     {
         $audit = Audit::findOne(['audit_oa_id' => $id]);
-        if (!$audit) {
-            throw new Exception("审核数据不存在!");
-        }
+
 
         return $audit;
     }
