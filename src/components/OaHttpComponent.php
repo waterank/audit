@@ -35,53 +35,6 @@ class OaHttpComponent implements OaComponentInterface
         return $this->oaHttpClient->createOa($params, $auditType, $accessToken);
     }
 
-    /**
-     * 创建OA审核单（内包含多条数据的表格）
-     *
-     * @param $params
-     * @param $auditType
-     * @param $accessToken
-     * @param $customConfig
-     *
-     * @return array
-     * @throws UserException
-     */
-    public function createBulkOa($params, $auditType, $accessToken, $customConfig = [])
-    {
-        $renderParams = [
-            'form' => $params,
-        ];
-        if ($customConfig) {
-            foreach ($customConfig as $item) {
-                if (!isset($item['type'])) {
-                    continue;
-                }
-                switch ($item['type']) {
-                    case 'total':
-                        $attribute = $item['attribute'] ?? '';
-                        $total     = 0;
-                        foreach ($params as $param) {
-                            $total += $param[$attribute] ?? 0;
-                        }
-                        $renderParams['total_amount'] = $total;
-                        break;
-                    case 'f2y':
-                        $f2yParams = $params;
-                        $attribute = $item['attribute'] ?? '';
-                        foreach ($f2yParams as $k => $f2YParam) {
-                            if(isset($f2YParam[$attribute])){
-                                $f2yParams[$k][$attribute] = round($f2YParam[$attribute] / 100, 2);
-
-                            }
-                        }
-                        $renderParams['form'] = $f2yParams;
-                        break;
-                }
-            }
-        }
-
-        return $this->oaHttpClient->createBulkOa($renderParams, $auditType, $accessToken, []);
-    }
 
     /**
      * 获取accessToken

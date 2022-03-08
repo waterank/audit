@@ -6,8 +6,6 @@ interface OaComponentInterface
 {
     public function createOa($params, $auditType, $accessToken);
 
-    public function createBulkOa($params, $auditType, $accessToken, $customConfig = []);
-
     public function getAccessToken($userId, $oaRefreshToken);
 
     public function getOaRedirectUrl($cacheKey);

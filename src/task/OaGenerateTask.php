@@ -18,12 +18,7 @@ class OaGenerateTask extends ProxyTaskHandler
         $audit       = self::findByAuditId($data['dataId'] ?? 0);
         $auditType   = $audit->audit_type;
         $userId      = $audit->audit_creator_id;
-        $params      = json_decode($audit->audit_oa_params, true);
-        if (isset($params['params'])) {
-            $oaParams = $params['params']['WorkflowApply'] ?? [];
-        } else {
-            $oaParams = $params;
-        }
+        $oaParams      = json_decode($audit->audit_oa_params, true);
 
         $accessToken = Yii::$app->getCache()->get($userId . AuditService::$oaAccessTokenKey);
         if (!$accessToken) {
@@ -38,25 +33,7 @@ class OaGenerateTask extends ProxyTaskHandler
             }
             $accessToken = $accessInfo['access_token'];
         }
-        if (stristr($auditType, 'bulk')) {
-            if (in_array($auditType, ['bulk_transfer', 'bulk_withdraw'])) {
-                $customConfig = [
-                    [
-                        'type'      => 'total',
-                        'attribute' => 'clearing_manual_amount',
-                    ],
-                    [
-                        'type'      => 'f2y',
-                        'attribute' => 'clearing_manual_amount',
-                    ],
-                ];
-                $oaResponse   = $oaComponent->createBulkOa($oaParams, $auditType, $accessToken, $customConfig);
-            } else {
-                $oaResponse = $oaComponent->createBulkOa($oaParams, $auditType, $accessToken);
-            }
-        } else {
-            $oaResponse = $oaComponent->createOa($oaParams, $auditType, $accessToken);
-        }
+        $oaResponse = $oaComponent->createOa($oaParams, $auditType, $accessToken);
         if (empty($oaResponse['entry_id'])) {
             throw new UserException('请求创建OA审核单接口失败' . json_encode($oaResponse, JSON_UNESCAPED_UNICODE));
         }
