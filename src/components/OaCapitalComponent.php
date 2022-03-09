@@ -60,8 +60,9 @@ class OaCapitalComponent implements OaComponentInterface
             ]
         );
         $response    = (array)json_decode($responseRaw, true);
-        if (!empty($response['code'])) {
-            throw new UserException($responseRaw);
+
+        if (!isset($response['code']) || $response['code'] !== 0){
+            throw new UserException("OA端返回信息：".$responseRaw);
         }
 
         return (array)json_decode($response['data'] ?? '', true);
