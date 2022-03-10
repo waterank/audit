@@ -22,13 +22,18 @@ class OaCallbackTask extends ProxyTaskHandler
         $keyValue  = null;
         if (class_exists('\\common\\models\\KeyValue')) {
             $keyValue = new \common\models\KeyValue();
+            if(!$keyValue){
+                throw new Exception("找不到KeyValue类");
+            }
+            $config = $keyValue::getValueAsArray('oa_oauth_config');
         } elseif (class_exists('\\kvmanager\\models\\KeyValue')) {
             $keyValue = new \kvmanager\models\KeyValue();
+            if(!$keyValue){
+                throw new Exception("找不到KeyValue类");
+            }
+            $config = $keyValue::takeAsArray('oa_oauth_config');
         }
-        if(!$keyValue){
-            throw new Exception("找不到KeyValue类");
-        }
-        $config = $keyValue::takeAsArray('oa_oauth_config');
+
         $auditThrowFlag = $config['audit_throw_flag'] ?? true;
         if (!$audit) {
             if($auditThrowFlag){
