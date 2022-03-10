@@ -57,7 +57,7 @@ class OaCapitalComponent implements OaComponentInterface
             [
                 CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'Authorization:Bearer ' . $accessToken],
                 CURLOPT_HEADER     => 0,
-            ]
+            ]   
         );
         $response    = (array)json_decode($responseRaw, true);
 
