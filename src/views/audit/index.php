@@ -6,6 +6,8 @@ use yii\data\ActiveDataProvider;
 use waterank\audit\models\Audit;
 use yii\helpers\Html;
 use yii\web\View;
+use yii\helpers\StringHelper;
+
 
 /* @var $this View */
 /* @var $dataProvider ActiveDataProvider */
@@ -13,10 +15,10 @@ use yii\web\View;
 
 
 $this->title                   = '审核列表';
-$this->params['breadcrumbs'][] = $this->title;?>
+$this->params['breadcrumbs'][] = $this->title; ?>
 <?= $this->render('_search', ['model' => $searchModel]); ?>
 <?=
- GridView::widget([
+GridView::widget([
     'dataProvider' => $dataProvider,
     'columns'      => [
         [
@@ -25,8 +27,8 @@ $this->params['breadcrumbs'][] = $this->title;?>
             'buttons'  => [
                 'view' => function ($url) {
                     return Html::a('查看', $url, [
-                        'class'  => 'btn btn-xs btn-success',
-                        'title'  => '查看',
+                        'class' => 'btn btn-xs btn-success',
+                        'title' => '查看',
                     ]);
                 },
             ],
@@ -53,5 +55,13 @@ $this->params['breadcrumbs'][] = $this->title;?>
         [
             'attribute' => 'audit_creator_name',
         ],
+        [
+            'attribute' => 'business_note',
+            'value'     => function ($val) {
+                return StringHelper::truncate($val->business_note, 40);
+            },
+        ],
+        ['attribute' => 'audit_created_at'],
+        ['attribute' => 'business_finished_at'],
     ],
 ]); ?>

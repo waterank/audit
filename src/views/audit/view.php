@@ -37,15 +37,39 @@ $this->params['breadcrumbs'][] = $this->title;
                     'attribute' => 'business_status',
                     'format'    => ['in', Audit::BUSINESS_STATUS_LIST],
                 ],
-                'business_note',
-                'business_key',
                 [
-                    'attribute' => 'audit_oa_params',
-                    'format'    => 'raw',
+                    'attribute'      => 'business_note',
+                    'format'         => 'raw',
                     'captionOptions' => [
                         'style' => 'width: 10%',
                     ],
-                    'value'     => function (Audit $model) {
+                    'value'          => function (Audit $model) {
+                        if (class_exists("\\xlerr\\jsoneditor\\JsonViewer")) {
+                            return \xlerr\jsoneditor\JsonViewer::widget([
+                                'value' => $model->business_note,
+                            ]);
+                        }
+                        if (class_exists("\\xlerr\\CodeEditor\\CodeEditor")) {
+                            return \xlerr\CodeEditor\CodeEditor::widget([
+                                'name'          => 'value_show',
+                                'value'         => $model->business_note,
+                                'clientOptions' => [
+                                    'readOnly' => true,
+                                    'mode'     => \xlerr\CodeEditor\CodeEditor::MODE_SQL,
+                                    'maxLines' => 40,
+                                ],
+                            ]);
+                        }
+                    },
+                ],
+                'business_key',
+                [
+                    'attribute'      => 'audit_oa_params',
+                    'format'         => 'raw',
+                    'captionOptions' => [
+                        'style' => 'width: 10%',
+                    ],
+                    'value'          => function (Audit $model) {
                         if (class_exists("\\xlerr\\jsoneditor\\JsonViewer")) {
                             return \xlerr\jsoneditor\JsonViewer::widget([
                                 'value' => $model->audit_oa_params,
@@ -65,12 +89,12 @@ $this->params['breadcrumbs'][] = $this->title;
                     },
                 ],
                 [
-                    'attribute' => 'audit_oa_response',
-                    'format'    => 'raw',
+                    'attribute'      => 'audit_oa_response',
+                    'format'         => 'raw',
                     'captionOptions' => [
                         'style' => 'width: 10%',
                     ],
-                    'value'     => function (Audit $model) {
+                    'value'          => function (Audit $model) {
                         if (class_exists("\\xlerr\\jsoneditor\\JsonViewer")) {
                             return \xlerr\jsoneditor\JsonViewer::widget([
                                 'value' => $model->audit_oa_response,
